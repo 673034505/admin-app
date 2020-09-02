@@ -14,4 +14,8 @@
 
 <style>
 	/*每个页面公共css */
+	::-webkit-scrollbar {
+	/*隐藏滚轮*/
+	display: none;
+	}
 </style>

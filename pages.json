@@ -3,7 +3,7 @@
 		{
 			"path": "pages/index/index",
 			"style": {
-				"navigationBarTitleText": "首页1"
+				"navigationBarTitleText": "首页"
 			}
 		}
 	    ,{
@@ -18,6 +18,41 @@
 				"navigationBarTitleText": "用户信息"
 			}
         }
+        ,{
+            "path" : "pages/navBar/navBar",
+            "style": {
+            	"navigationBarTitleText": "导航栏",
+            	"app-plus":{          //App端扩展配置
+            		"pullToRefresh":{
+            			"support":"true",
+            			"style":"default",
+            			"contentdown":"下拉刷新1",
+            			"contentover":"下拉刷新2",
+            			"contentrefresh":"下拉刷新3"
+            
+            		},
+					"scrollIndicator" : "none",  
+            		"titleNView":{      //原生导航栏配置参数
+            			"backgroundColor":"#002a61",
+            			"buttons": [{
+                            "color": "#fff",
+                            "float": "left",
+                            "fontSize": "18px",
+            				"text": "邢台市",
+            				"width":"80px"
+                        },
+                        {
+                             "color": "#fff",
+                             "colorPressed": "#eee",
+                             "float": "right",
+                             "fontSize": "22px",
+                             "text": "\ue678" 
+                        }
+                        ]
+            		}
+				}
+            }
+        }
     ],
 	"tabBar": {
 		"color": "#7a7e83",
@@ -29,6 +64,11 @@
 			"iconPath": "static/img/home.png",
 			"selectedIconPath": "static/img/homeHL.png"
 		},{
+			"pagePath": "pages/navBar/navBar",
+			"text": "导航栏",
+			"iconPath": "static/img/user.png",
+			"selectedIconPath": "static/img/userHL.png"
+		},{
 			"pagePath": "pages/userInfo/userInfo",
 			"text": "用户信息",
 			"iconPath": "static/img/user.png",
@@ -39,58 +79,6 @@
 		"navigationBarTextStyle": "white",
 		"navigationBarBackgroundColor": "#0faeff",
 		"navigationBarTitleText": "uni-app",
-		"backgroundColor": "#F8F8F8",
-		"usingComponents": { //这里为方便，全局引入了所有组件，也可以在某个page下单独引用某个组件
-			"demo-block": "/wxcomponents/vant/demo-block/index",
-			"van-action-sheet": "/wxcomponents/vant/action-sheet/index",
-			"van-area": "/wxcomponents/vant/area/index",
-			// "van-badge": "/wxcomponents/vant/badge/index",
-			// "van-badge-group": "/wxcomponents/vant/badge-group/index",
-			"van-button": "/wxcomponents/vant/button/index",
-			"van-card": "/wxcomponents/vant/card/index",
-			"van-cell": "/wxcomponents/vant/cell/index",
-			"van-cell-group": "/wxcomponents/vant/cell-group/index",
-			"van-checkbox": "/wxcomponents/vant/checkbox/index",
-			"van-checkbox-group": "/wxcomponents/vant/checkbox-group/index",
-			"van-col": "/wxcomponents/vant/col/index",
-			"van-dialog": "/wxcomponents/vant/dialog/index",
-			"van-field": "/wxcomponents/vant/field/index",
-			"van-goods-action": "/wxcomponents/vant/goods-action/index",
-			"van-goods-action-icon": "/wxcomponents/vant/goods-action-icon/index",
-			"van-goods-action-button": "/wxcomponents/vant/goods-action-button/index",
-			"van-icon": "/wxcomponents/vant/icon/index",
-			"van-loading": "/wxcomponents/vant/loading/index",
-			"van-nav-bar": "/wxcomponents/vant/nav-bar/index",
-			"van-notice-bar": "/wxcomponents/vant/notice-bar/index",
-			"van-notify": "/wxcomponents/vant/notify/index",
-			"van-panel": "/wxcomponents/vant/panel/index",
-			"van-popup": "/wxcomponents/vant/popup/index",
-			"van-progress": "/wxcomponents/vant/progress/index",
-			"van-radio": "/wxcomponents/vant/radio/index",
-			"van-radio-group": "/wxcomponents/vant/radio-group/index",
-			"van-row": "/wxcomponents/vant/row/index",
-			"van-search": "/wxcomponents/vant/search/index",
-			"van-slider": "/wxcomponents/vant/slider/index",
-			"van-stepper": "/wxcomponents/vant/stepper/index",
-			"van-steps": "/wxcomponents/vant/steps/index",
-			"van-submit-bar": "/wxcomponents/vant/submit-bar/index",
-			"van-swipe-cell": "/wxcomponents/vant/swipe-cell/index",
-			"van-switch": "/wxcomponents/vant/switch/index",
-			// "van-switch-cell": "/wxcomponents/vant/switch-cell/index",
-			"van-tab": "/wxcomponents/vant/tab/index",
-			"van-tabs": "/wxcomponents/vant/tabs/index",
-			"van-tabbar": "/wxcomponents/vant/tabbar/index",
-			"van-tabbar-item": "/wxcomponents/vant/tabbar-item/index",
-			"van-tag": "/wxcomponents/vant/tag/index",
-			"van-toast": "/wxcomponents/vant/toast/index",
-			"van-transition": "/wxcomponents/vant/transition/index",
-			"van-tree-select": "/wxcomponents/vant/tree-select/index",
-			"van-datetime-picker": "/wxcomponents/vant/datetime-picker/index",
-			"van-rate": "/wxcomponents/vant/rate/index",
-			"van-collapse": "/wxcomponents/vant/collapse/index",
-			"van-collapse-item": "/wxcomponents/vant/collapse-item/index",
-			"van-picker": "/wxcomponents/vant/picker/index",
-			"van-calendar": "/wxcomponents/vant/calendar/index"
-		}
+		"backgroundColor": "#F8F8F8"
 	}
 }
