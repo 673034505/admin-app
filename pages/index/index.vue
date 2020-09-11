@@ -1,7 +1,7 @@
 
 <template>
          <view class="container">
-			 
+			 <u-button type="primary"  @click="golist">主要按钮</u-button>
             <button type="default" @click="golist">跳转</button>
         </view>
 </template>
