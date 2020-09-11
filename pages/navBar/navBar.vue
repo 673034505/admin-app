@@ -10,52 +10,54 @@
                     </view>
                 </scroll-view>
                 <!-- 导航栏与下拉刷新 -->
-                <view class="content">
-					<view v-if="TabCur == 0">
+                <view class="content" ref="btn"   @scroll="scroll">
+					<view id="sollop">
+                        <view v-if="TabCur == 0">
                         11
-                    </view>
-                   <view v-if="TabCur == 1">
+                        </view>
+                        <view v-if="TabCur == 1">
+                            
+                        </view>
+                        <view v-if="TabCur == 2">
+                            
+                        </view>
+                        <view v-if="TabCur == 3"  >
+                            <!-- 导航栏与下拉刷新与设置头部样式 -->
+                            <!-- "style": {
+                            "navigationBarTitleText": "导航栏",
+                            // "enablePullDownRefresh": true,
+                            "app-plus":{          //App端扩展配置
+                                "pullToRefresh":{
+                                    "support":"true",
+                                    "style":"default",
+                                    "contentdown":"下拉刷新1",
+                                    "contentover":"下拉刷新2",
+                                    "contentrefresh":"下拉刷新3"
                         
-                    </view>
-					<view v-if="TabCur == 2">
-                        
-                    </view>
-                    <view v-if="TabCur == 3">
-                        <!-- 导航栏与下拉刷新与设置头部样式 -->
-                        <!-- "style": {
-                        "navigationBarTitleText": "导航栏",
-                        // "enablePullDownRefresh": true,
-                        "app-plus":{          //App端扩展配置
-                            "pullToRefresh":{
-                                "support":"true",
-                                "style":"default",
-                                "contentdown":"下拉刷新1",
-                                "contentover":"下拉刷新2",
-                                "contentrefresh":"下拉刷新3"
-                    
-                            },
-                            "titleNView":{      //原生导航栏配置参数
-                                "backgroundColor":"#002a61",
-                                "buttons": [{
-                                    "color": "#fff",
-                                    "float": "left",
-                                    "fontSize": "18px",
-                                    "text": "邢台市",
-                                    "width":"80px"
                                 },
-                                {
-                                    "color": "#fff",
-                                    "colorPressed": "#eee",
-                                    "float": "right",
-                                    "fontSize": "22px",
-                                    "text": "\ue678" 
+                                "titleNView":{      //原生导航栏配置参数
+                                    "backgroundColor":"#002a61",
+                                    "buttons": [{
+                                        "color": "#fff",
+                                        "float": "left",
+                                        "fontSize": "18px",
+                                        "text": "邢台市",
+                                        "width":"80px"
+                                    },
+                                    {
+                                        "color": "#fff",
+                                        "colorPressed": "#eee",
+                                        "float": "right",
+                                        "fontSize": "22px",
+                                        "text": "\ue678" 
+                                    }
+                                    ]
                                 }
-                                ]
                             }
-                        }
-                    } -->
-                        <view class="solid-top" v-for="(item,index) in items" :key="index">
-                            <view class="item"> {{item}} </view>
+                        } -->
+                            <view class="solid-top" v-for="(item,index) in items" :key="index">
+                                <view class="item"> {{item}} </view>
+                            </view>
                         </view>
                     </view>
                 </view>
@@ -71,7 +73,9 @@
             return {
                 items:30,
                 TabCur: 0,
-				scrollLeft: 0
+                scrollLeft: 0,
+                isSupport:true,
+                startTop:0,
             }
         },
 		onLoad() {
@@ -81,12 +85,42 @@
                     plus.navigator.closeSplashscreen() 
                 // #endif
 			},3000)
-		},
+        },
+        mounted() {
+            let _self = this;
+            const query = uni.createSelectorQuery().in(this);
+            query.select('#sollop').boundingClientRect(data => {
+				//开始获取顶部
+				_self.startTop =  data.top
+			}).exec();
+        },
         methods: {
             tabSelect(e){
                 this.TabCur = e.currentTarget.dataset.id;
 				this.scrollLeft = (e.currentTarget.dataset.id - 1) * 60
             },
+            scroll(e){//滚轮条发生边哈
+				  let _self = this;
+				  const query = uni.createSelectorQuery().in(this);
+				  query.select('#sollop').boundingClientRect(data => {
+					if( data.top == _self.startTop){//当他到达顶部时
+						_self.isSupport  = true;
+					}else{
+						_self.isSupport  = false;
+                    }
+					_self.isOpenRefresh()
+				  }).exec();
+              },
+              isOpenRefresh(){//设置下拉刷新
+				const pages = getCurrentPages();  
+				const page = pages[pages.length - 1];  
+				const currentWebview = page.$getAppWebview();
+				currentWebview.setStyle({  
+				  pullToRefresh: {  
+				    support: this.isSupport,
+				  }  
+				});  
+			},
         },
         onPullDownRefresh() {
             setTimeout(function(){
@@ -99,6 +133,7 @@
 
 .container{
     height: 100vh;
+	overflow: hidden;
     .bg-white {
         background-color: #ffffff;
         color: #666666;

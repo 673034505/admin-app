@@ -15,7 +15,25 @@
         ,{
             "path" : "pages/userInfo/userInfo",
             "style": {
-				"navigationBarTitleText": "用户信息"
+				"backgroundColorTop": "#ebebeb",  
+				"backgroundColorBottom": "#ebebeb",
+				"app-plus":{ 
+					"scrollIndicator": "none",
+					"titleNView": {  
+						"backgroundColor":"#c0c0c0",
+                        "searchInput":{
+							"borderRadius": "15px",
+							"placeholder": "输入要搜索内容"
+						},
+						"buttons":[
+						{
+							"text":"搜索",
+							"fontSize": "16px",
+							"width": "48px"
+						}
+						]
+                    }  
+				}
 			}
         }
         ,{
@@ -25,10 +43,17 @@
             	"app-plus":{          //App端扩展配置
             		"pullToRefresh":{
             			"support":"true",
-            			"style":"default",
-            			"contentdown":"下拉刷新1",
-            			"contentover":"下拉刷新2",
-            			"contentrefresh":"下拉刷新3"
+						"style":"default",
+						"range":"10%",
+            			"contentdown": {
+							"caption": "下拉可刷新自定义文本"
+						},
+						"contentover": {
+							"caption": "释放可刷新自定义文本"
+						},
+						"contentrefresh": {
+							"caption": "正在刷新自定义文本"
+						}
             
             		},
 					"scrollIndicator" : "none",  
@@ -52,6 +77,10 @@
             		}
 				}
             }
+        }
+        ,{
+            "path" : "pages/navBar/list/list",
+            "style" : {}
         }
     ],
 	"tabBar": {

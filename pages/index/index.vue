@@ -2,7 +2,7 @@
 <template>
          <view class="container">
 			 
-            
+            <button type="default" @click="golist">跳转</button>
         </view>
 </template>
 <script>
@@ -22,6 +22,14 @@
                 // #endif
 			},3000)
 		},
+		methods:{
+			golist(){
+				this.$navTo('navBar/list/list',{id:'123',name:'刘燃燃'})
+				// this.$http('/airMoniData/getCityInfoByTime',{},'GET').then(res=>{
+				// 	console.log(res)
+				// })
+			}
+		}
         
     }
 </script>
