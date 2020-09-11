@@ -17,7 +17,7 @@
                         </view>
                         <view v-if="TabCur == 1">
                             
-                        </view>
+                        </view> 
                         <view v-if="TabCur == 2">
                             
                         </view>
