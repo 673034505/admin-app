@@ -1,8 +1,8 @@
 
 <template>
          <view class="container">
-			<u-button type="primary"  @click="golist">主要按钮</u-button>
-            <button type="default" @click="golist">跳转</button>
+			<!-- <u-button type="primary"  @click="golist">主要按钮</u-button> -->
+            <!-- <button type="default" @click="golist">跳转</button> -->
             <view class="navTitle">
                 <view class="nav-city">
                     城市
@@ -11,7 +11,7 @@
                     <view class="date-box" >
                         <view class="date-left" @click="upper"> <view class="circular"> <u-icon name="arrow-left" style="color:eee;"></u-icon></view> </view>
                         <view class="date-center"> {{chineseDateMonth}} </view>
-                        <view class="date-right" @click="lower"><view class="circular"> <u-icon name="arrow-right" style="color:eee;"></u-icon></view> </view>
+                        <view class="date-right" @click="lower"><view class="circular" v-if="lowerShow"> <u-icon name="arrow-right" style="color:eee;"></u-icon></view> </view>
                     </view>
                 </view>
                 <view class="nav-today">
@@ -24,7 +24,9 @@
             :calendarData="calendarData"
             ref="calendar"
             />
-            
+            <view class="month">
+                
+            </view>
         </view>
 </template>
 <script>
@@ -44,6 +46,7 @@ import {getLastDateOfMonth,getDateYMD,getLastDateDay,getDateYM,addZero,dateAdd} 
                 starttime:'',
                 endtime:'',
                 calendarData:[],
+                lowerShow:false,
             }
         },
 		onLoad() {
@@ -70,9 +73,6 @@ import {getLastDateOfMonth,getDateYMD,getLastDateDay,getDateYM,addZero,dateAdd} 
 		methods:{
 			golist(){
 				this.$navTo('navBar/list/list',{id:'123',name:'刘燃燃'})
-				// this.$http('/airMoniData/getCityInfoByTime',{},'GET').then(res=>{
-				// 	console.log(res)
-				// })
             },
             dateChange(e){
                 //返回日期
@@ -84,6 +84,13 @@ import {getLastDateOfMonth,getDateYMD,getLastDateDay,getDateYM,addZero,dateAdd} 
                 this.chineseDateMonth = e.chineseDateMonth;
                 this.starttime = `${getDateYM(dateAdd(new Date(e.date),'d',-0),'')}01000000`;
                 this.endtime = `${getDateYM(dateAdd(new Date(e.date),'d',-0),'')}${addZero(getLastDateDay(new Date()))}000000`;
+
+                let date = new Date()
+                if( (e.year == date.getFullYear()) && (e.month == date.getMonth() + 1) ){
+                    this.lowerShow = false
+                }else{
+                    this.lowerShow = true;
+                }
                 this.queryData();
             },
             backToday(){
@@ -96,7 +103,7 @@ import {getLastDateOfMonth,getDateYMD,getLastDateDay,getDateYM,addZero,dateAdd} 
             lower(){//下个月
                 this.$refs.calendar.lower();
             },
-            queryData(){
+            queryData(){//查询数据
                 let params = {
                     starttime:this.starttime,
                     endtime:this.endtime,
