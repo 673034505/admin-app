@@ -71,7 +71,7 @@ export default {
 
     },
     watch: {
-        calendarData(val){
+        calendarData(val){//当数据发生变化时
             this.initCelendarData();
         }
     },
@@ -159,7 +159,8 @@ export default {
             this.$emit('dateMonthChanges',{
                 date:`${this.currentYear}/${this.currentMonth}/${this.currentDay}`,
                 chineseDateMonth:`${this.currentYear}年${this.currentMonth}月`,
-                month:this.currentMonth
+                month:this.currentMonth,
+                year:this.currentYear,
                 })
         },
         dateClick(obj){//点击日期
