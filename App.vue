@@ -26,15 +26,15 @@ var _self;
 				})
 			},
 			appUpgrade(e){//App更新包
-				console.log(e,e.platform)
+				// console.log(e,e.platform)
 				if( e.platform == 'android'){
-					console.log('安卓')
+					// console.log('安卓')
 					 // 获取本地应用资源版本号  
 					 // #ifdef APP-PLUS
 						plus.runtime.getProperty(plus.runtime.appid,function(inf){  
 							//wgtVer=inf.version;  
 							// console.log("当前应用版本："+inf.version+"---"+plus.runtime.version);  
-							console.log(inf.versionCode,inf.version)
+							// console.log(inf.versionCode,inf.version)
 							let appInfo = {
 								version:inf.version,
 								versionCode:inf.versionCode,
@@ -58,7 +58,7 @@ var _self;
 
 				var inf = plus.push.getClientInfo();
 				if (uni.getSystemInfoSync().platform == 'android') {
-					console.log('应用的 appid 为安卓：' + inf.clientid);
+					// console.log('应用的 appid 为安卓：' + inf.clientid);
 				} else if (uni.getSystemInfoSync().platform == 'ios') {
 					console.log('应用的 appid 为IOS：' + inf.token);
 				}

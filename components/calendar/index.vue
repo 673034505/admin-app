@@ -1,27 +1,26 @@
 <template>
     <view class="calendar">
-        <view  class="title">
+        <!-- <view  class="title">
             <view class="nex" @click="upper">上个月</view>
-            <view class="nex" style="width:150px">时间:{{currentYear}}-{{currentMonth}}-{{currentDay}} </view>
+            <view class="nex" style="width:150px" @click="backToday">时间:{{currentYear}}-{{currentMonth}}-{{currentDay}} </view>
             <view class="nex" @click="lower">下个月</view>
-        </view>
+        </view>  -->
     
         <view class="week-header">
             <view class="month" v-for="(item,i) in week" :key="i">{{item}}</view>
         </view>
         <view class="week-date">
-            <!-- <view class="every-day"> -->
                 <view class="every-day" v-for="(pre) in preDay" :key="pre+'preDay'" style="color:#999;">
-                    <view class="every-box" style=" background: #eee;">
+                    <view class="every-box" style=" background: #eee;" >
                         <view class="top-days">{{getLastMonthSize()-preDay+pre }}</view>
                         <view class="bottom-primarypol">-</view>
                     </view>
                     
                 </view>
                 <view class="every-day" v-for="(count) in monthSize" :key="count+'monthSize'">
-                    <view class="every-box">
+                    <view class="every-box"  :class="{dateSelect:count == currentDay }" @click="dateClick({index:count})" :style="{background:listData[count-1] && listData[count-1].background?listData[count-1].background:'',color:listData[count-1] && listData[count-1].color?listData[count-1].color:'',}">
                         <view class="top-days">{{count}}</view>
-                        <view class="bottom-primarypol"></view>
+                        <view class="bottom-primarypol"> <text v-if="listData[count-1]"> <text v-html="listData[count-1].air"></text> </text>  <text v-else>-</text>  </view>
                         
                     </view>
                     
@@ -33,13 +32,19 @@
                     </view> 
                 </view>
             </view>
-        <!-- </view> -->
     </view>
 </template>
 
 <script>
+import {getLastDateOfMonth,getDateYMD,getLastDateDay} from '@/utils/date.js'
+import {getAqiColor,getAqiTextColor} from '@/utils/aqi.js'
 export default {
     name:"calendar",
+    props:{
+        calendarData:{
+            type: Array,//必传
+        }
+    },
     data() {
         return {
             currentDay: "",//当前日期
@@ -50,6 +55,9 @@ export default {
             monthSize:0,//当前月份 有多少天
             week:['日','一','二','三','四','五','六'],
             monthList:[31,28,31,30,31,30,31,31,30,31,30,31],
+            listData:[],//数据
+            strObj:{'PM2.5':`PM<sub>2.5</sub>`,'PM25':'PM<sub>2.5</sub>','PM10':'PM<sub>10</sub>','SO2':`SO<sub>2</sub>`,'NO2':'NO<sub>2</sub>','o3':'O<sub><sub>3</sub>'},
+            // wrwObj:{aqi:'AQI','pm25':'PM2.5','pm10':'PM10','so2':'SO2','o3':'O3','no2':'NO2','co':'CO','o3_8h':'O3' },
 
         }
     },
@@ -57,8 +65,34 @@ export default {
         this.getCurrent();
         this.getLastMonthSize();
         this.getNextMonthSize();
+
+    },
+    computed: {
+
+    },
+    watch: {
+        calendarData(val){
+            // this.initCelendarData();
+        }
     },
     methods: {
+        initCelendarData(){//值发生变化
+            let dataArr = []
+            this.calendarData.map(item=>{
+                let day =new Date(item.datatime.replace(/-/g, '/')).getDate();
+                item['day'] = day;
+                if(item.primarypol == 'O3-8h' ){
+                    item.primarypol = 'o3'
+                }
+
+                item['background'] = getAqiColor(item.aqi);
+                item['color'] = getAqiTextColor(item.aqi);
+                item['air'] = this.strObj[item.primarypol]
+                dataArr.push(item)
+            })
+            this.listData = dataArr
+            console.log(dataArr,'1')
+        },
         getCurrent(){
             //获取年月日
             const date = new Date();
@@ -74,22 +108,19 @@ export default {
         },
         getLastMonthSize(){
             //获取当月的天数
-            this.monthSize = this.monthList[this.currentMonth - 1];
+            this.monthSize = getLastDateDay(new Date(`${this.currentYear}/${this.currentMonth}`) );
             //获取本月第一天是星期几
             const  firstDay = new Date(`${this.currentYear}/${this.currentMonth/1}`).getDay();
-            // console.log("本月的第一天是"+firstDay);
             //当月一号前面的上月剩余天数
             this.preDay = firstDay === 7 ? 0 : firstDay;
             //获取上月天数大小,这个月是1的话上个月就是12, 就是31天
-            // console.log( this.currentMonth - 1 === 0 ? 31 : this.monthList[ this.currentMonth -2 ])
             return this.currentMonth - 1 === 0 ? 31 : this.monthList[ this.currentMonth -2 ];
         },
         getNextMonthSize(){
             //获取当月天数
-            this.monthSize = this.monthList[this.currentMonth - 1 ];
+            this.monthSize = getLastDateDay(new Date(`${this.currentYear}/${this.currentMonth}`) );
             //获取本月最后一天是星期几
             const lastDay = new Date(`${this.currentYear}/${this.currentMonth}/${this.monthSize}`).getDay();
-            // console.log('本月最后一天是'+lastDay)
             this.nextDay  = lastDay === 7 ? 6 : 6 - lastDay;
         },
         upper(){//上个月
@@ -98,9 +129,11 @@ export default {
                 this.currentMonth = 12;//初始化到12月
                 this.currentYear = (this.currentYear  - 1);
             }
+            this.listData = [];
             this.getLastMonthSize();
             this.getNextMonthSize();
 
+            this.judgeDay();
         },
         lower(){//下个月
             let date = new Date();
@@ -112,10 +145,43 @@ export default {
                 this.currentMonth = 1;//初始化到1月
                 this.currentYear = (this.currentYear  + 1);
             }
+            this.listData = [];
             this.getLastMonthSize();
             this.getNextMonthSize();
+            this.judgeDay();
         },
-        
+        judgeDay(){//切换月份
+            let lastDay= getLastDateDay(new Date(`${this.currentYear}/${this.currentMonth}`));
+            if(  (Number(this.currentDay)) > (Number(lastDay)   ) ){
+                this.currentDay = lastDay;
+            }
+            //返回日期
+            this.$emit('dateMonthChanges',{
+                date:`${this.currentYear}/${this.currentMonth}/${this.currentDay}`,
+                chineseDateMonth:`${this.currentYear}年${this.currentMonth}月`,
+                month:this.currentMonth
+                })
+        },
+        dateClick(obj){//点击日期
+            this.currentDay = obj.index;
+            //点击时返回
+            this.$emit('dateChanges',{
+                date:`${this.currentYear}/${this.currentMonth}/${this.currentDay}`,
+                })
+        },
+        backToday(){//返回今天
+            const date = new Date();
+            if( (this.currentYear == date.getFullYear()) && (this.currentMonth == (date.getMonth()+1)) && (this.currentDay == date.getDate()) ){//当他为今天时 不发生任何变化
+                return
+            }
+            this.currentYear = date.getFullYear();
+            this.currentMonth = date.getMonth()+1;
+            this.currentDay = date.getDate();
+
+            this.getLastMonthSize();
+            this.getNextMonthSize();
+            this.judgeDay();
+        }
 
 
     },
@@ -154,6 +220,7 @@ export default {
         margin: 0;
         display: flex;
         flex-wrap: wrap;
+        font-size: 12px;
         justify-content: space-around;
         .every-day{
             display: inline-block;
@@ -164,7 +231,7 @@ export default {
                 justify-content: center;
                 align-items: center;
                 width: 80%;
-                height: 50px;
+                height: 45px;
                 margin: 0 10%;
                 padding: 0 5px;
                 flex-wrap: wrap;
@@ -179,12 +246,17 @@ export default {
                 }
                 .bottom-primarypol{
                     height: 30px;
-                    line-height: 30px;
+                    line-height: 10px;
                     width: 100%;
+                    font-size: 8px;
                     display: flex;
                     justify-content: center;
                     align-items: center;
+                    
                 }
+            }
+            .dateSelect{
+                border: 1px solid #92a7f6;
             }
         }
     }

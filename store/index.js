@@ -37,7 +37,6 @@ const store = new Vuex.Store({
 			state.hasLogin = false;
 		},
 		getAppInfo(state,response){//获取版本号
-			console.log('获取到版本号')
 			state.version = response.version;
 			state.versionCode = response.versionCode
 		},
