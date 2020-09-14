@@ -3,13 +3,15 @@
          <view class="container">
 			<u-button type="primary"  @click="golist">主要按钮</u-button>
             <button type="default" @click="golist">跳转</button>
-            <div v-for="(ite,i) in 3">
-                {{ite+1}}
-            </div>
+            <calendar />
         </view>
 </template>
 <script>
+import calendar from "@/components/calendar/index.vue"
     export default {
+        components: {
+            calendar
+        },
         data() {
             return {
                 items:50,
