@@ -72,7 +72,7 @@ export default {
     },
     watch: {
         calendarData(val){
-            // this.initCelendarData();
+            this.initCelendarData();
         }
     },
     methods: {
