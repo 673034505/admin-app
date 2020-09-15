@@ -82,7 +82,11 @@
             "path" : "pages/navBar/list/list",
             "style" : {}
         }
-	],
+	    ,{
+            "path" : "pages/list/airCalendar/airCalendar",
+            "style" : {}
+        }
+    ],
 	"easycom": {
 		// npm安装的方式不需要前面的"@/"，下载安装的方式需要"@/"
 		// npm安装方式

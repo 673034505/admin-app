@@ -72,7 +72,7 @@ export default {
     },
     watch: {
         calendarData(val){//当数据发生变化时
-            this.initCelendarData();
+            // this.initCelendarData();
         }
     },
     methods: {
@@ -192,7 +192,6 @@ export default {
 <style lang="less" scoped>
 .calendar{
     width: 100vw;
-    height: 100%;
     .title{
         display: flex;
         margin-left: 50px;

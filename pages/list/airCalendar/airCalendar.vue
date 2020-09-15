@@ -24,50 +24,14 @@
             :calendarData="calendarData"
             ref="calendar"
             />
-
             <view class="month">
                 <view class="month-title">
                     <text class="title-text">9月统计</text>
                 </view>
-                <!-- 污染等级 -->
                 <view class="title-level">
-                    <view class="level-left">等级天数:</view>
-                    <view class="level-right"> 
-                        <view class="level-li"> 
-                            <view class="level-text">优</view>
-                            <view class="level-circular" style="background:#00e400;"></view>
-                        </view>
-                        <view class="level-li"> 
-                            <view class="level-text">良</view>
-                            <view class="level-circular" style="background:#ffff00;"></view>
-                        </view>
-                        <view class="level-li"> 
-                            <view class="level-text">轻度</view>
-                            <view class="level-circular" style="background:#ff7e00;"></view>
-                        </view>
-                        <view class="level-li"> 
-                            <view class="level-text">中度</view>
-                            <view class="level-circular" style="background:#ff0000;"></view>
-                        </view>
-                        <view class="level-li"> 
-                            <view class="level-text">重度</view>
-                            <view class="level-circular" style="background:#99004c;"></view>
-                        </view>
-                        <view class="level-li"> 
-                            <view class="level-text">严重</view>
-                            <view class="level-circular" style="background:#7e0023;"></view>
-                        </view>
-                    </view>
-                </view>
-                <!-- 首要污染物 -->
-                <view class="primarypols">
-                    <view class="primarypols-left">首要污染物 </view>
-                    <view class="primarypols-right">
-                        
-                    </view>
+                    
                 </view>
             </view>
-
         </view>
 </template>
 <script>
@@ -241,34 +205,6 @@ import {getLastDateOfMonth,getDateYMD,getLastDateDay,getDateYM,addZero,dateAdd} 
             border-bottom: 1px solid #b2b2b2;
             .title-text{
                 padding-left: 10px;
-            }
-        }
-        .title-level{
-            width: 100vw;
-            height: 30px;
-            line-height: 30px;
-            display: flex;
-            .level-left{
-                padding-left: 10px;
-                width: 70px;
-            }
-            .level-right{
-                width: calc(100% - 70px );
-                height: 100%;
-                display: flex;
-                .level-li{
-                    display: flex;
-                    align-items: center;
-                    .level-text{
-                         margin: 0 5px;
-                    }
-                    .level-circular{
-                        width: 15px;
-                        height: 15px;
-                        border-radius: 50%;
-                    
-                    }
-                }
             }
         }
     }
