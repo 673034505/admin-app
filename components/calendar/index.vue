@@ -56,7 +56,7 @@ export default {
             week:['日','一','二','三','四','五','六'],
             monthList:[31,28,31,30,31,30,31,31,30,31,30,31],
             listData:[],//数据
-            strObj:{'PM2.5':`PM<sub>2.5</sub>`,'PM25':'PM<sub>2.5</sub>','PM10':'PM<sub>10</sub>','SO2':`SO<sub>2</sub>`,'NO2':'NO<sub>2</sub>','o3':'O<sub><sub>3</sub>'},
+            strObj:{'PM2.5':`PM<sub>2.5</sub>`,'PM25':'PM<sub>2.5</sub>','PM10':'PM<sub>10</sub>','SO2':`SO<sub>2</sub>`,'NO2':'NO<sub>2</sub>','o3':'O<sub><sub>3</sub>','O3-8h':'O<sub><sub>3</sub>','O3':'O<sub><sub>3</sub>','-':'-'},
             // wrwObj:{aqi:'AQI','pm25':'PM2.5','pm10':'PM10','so2':'SO2','o3':'O3','no2':'NO2','co':'CO','o3_8h':'O3' },
 
         }
@@ -72,7 +72,7 @@ export default {
     },
     watch: {
         calendarData(val){//当数据发生变化时
-            // this.initCelendarData();
+            this.initCelendarData();
         }
     },
     methods: {
@@ -91,7 +91,6 @@ export default {
                 dataArr.push(item)
             })
             this.listData = dataArr
-            console.log(dataArr,'1')
         },
         getCurrent(){
             //获取年月日

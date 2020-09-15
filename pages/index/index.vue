@@ -1,8 +1,6 @@
 
 <template>
          <view class="container">
-			<!-- <u-button type="primary"  @click="golist">主要按钮</u-button> -->
-            <!-- <button type="default" @click="golist">跳转</button> -->
             <view class="navTitle">
                 <view class="nav-city">
                     城市
@@ -35,36 +33,131 @@
                     <view class="level-right"> 
                         <view class="level-li"> 
                             <view class="level-text">优</view>
-                            <view class="level-circular" style="background:#00e400;"></view>
+                            <view class="level-circular" style="background:#00e400;"> <text class="texts">{{excellent}}</text> </view>
                         </view>
                         <view class="level-li"> 
                             <view class="level-text">良</view>
-                            <view class="level-circular" style="background:#ffff00;"></view>
+                            <view class="level-circular" style="background:#ffee00;"> <text class="texts">{{good}}</text> </view>
                         </view>
                         <view class="level-li"> 
                             <view class="level-text">轻度</view>
-                            <view class="level-circular" style="background:#ff7e00;"></view>
+                            <view class="level-circular" style="background:#ff7e00;"> <text class="texts">{{light}}</text> </view>
                         </view>
                         <view class="level-li"> 
                             <view class="level-text">中度</view>
-                            <view class="level-circular" style="background:#ff0000;"></view>
+                            <view class="level-circular" style="background:#ff0000;"> <text class="texts"> {{moderate}} </text> </view>
                         </view>
                         <view class="level-li"> 
                             <view class="level-text">重度</view>
-                            <view class="level-circular" style="background:#99004c;"></view>
+                            <view class="level-circular" style="background:#99004c;"> <text class="texts"> {{severe}}</text> </view>
                         </view>
                         <view class="level-li"> 
                             <view class="level-text">严重</view>
-                            <view class="level-circular" style="background:#7e0023;"></view>
+                            <view class="level-circular" style="background:#7e0023;"> <text class="texts"> {{serious}} </text> </view>
                         </view>
                     </view>
                 </view>
                 <!-- 首要污染物 -->
                 <view class="primarypols">
-                    <view class="primarypols-left">首要污染物 </view>
+                    <view class="primarypols-left">首要污染物:</view>
                     <view class="primarypols-right">
-                        
+                        <view class="primarypols-li">
+                            <view class="primarypols-text">PM<sub>2.5</sub> </view>
+                            <view class="primarypols-circular"> <text class="texts">{{pm25}}</text> </view>
+                        </view>
+                        <view class="primarypols-li">
+                            <view class="primarypols-text">PM<sub>10</sub> </view>
+                            <view class="primarypols-circular"> <text class="texts">{{pm10}}</text> </view>
+                        </view>
+                        <view class="primarypols-li">
+                            <view class="primarypols-text">O<sub>3</sub> </view>
+                            <view class="primarypols-circular"> <text class="texts">{{o3}}</text> </view>
+                        </view>
+                        <view class="primarypols-li">
+                            <view class="primarypols-text">SO<sub>2</sub> </view>
+                            <view class="primarypols-circular"> <text class="texts">{{so2}}</text> </view>
+                        </view>
+                        <view class="primarypols-li">
+                            <view class="primarypols-text">NO<sub>2</sub> </view>
+                            <view class="primarypols-circular"> <text class="texts">{{no2}}</text> </view>
+                        </view>
+                        <view class="primarypols-li">
+                            <view class="primarypols-text">CO</view>
+                            <view class="primarypols-circular"> <text class="texts">{{co}}</text> </view>
+                        </view>
                     </view>
+                </view>
+            </view>
+            <view style="width:100vw;height:12px;background:#f3f7fa;"></view>
+            
+            <!-- 当天城市信息 -->
+            <view class="dayInfo">
+                <view class="dayInfo-left">
+                    <view class="left-box">
+                        <view class="border-white">
+                            <view class="box-content">
+                                <view class="box-top"> <view class="box-circular"> </view> </view>
+                                <view class="box-center"> <view class="box-font"> 83 </view>  </view>
+                                <view class="box-bottom">
+                                    <view class="box-size">AQI: 良</view>
+                                </view>
+                            </view>
+                        </view>
+                    </view>
+                </view>
+                <view class="dayInfo-right">
+                    <view class="right-title">
+                        <view class="title-top">
+                            <view class="title-top-left">
+                                邯郸市
+                            </view>
+                            <view class="title-top-right">
+                                2020-09-15
+                            </view>
+                        </view>
+                        <view class="title-center">
+                            细颗粒物: PM<sub>2.5</sub>
+                        </view>
+                        <view class="title-bottom">
+                            <view class="title-li">
+                                <view class="li-left"> CO </view>
+                                <view class="li-right"> 0.8 </view>
+                            </view>
+                            <view class="title-li">
+                                <view class="li-left"> NO<sub>2</sub> </view>
+                                <view class="li-right"> 0.8 </view>
+                            </view>
+                            <view class="title-li">
+                                <view class="li-left"> O<sub>3</sub>_8h </view>
+                                <view class="li-right"> 26 </view>
+                            </view>
+                            <view class="title-li">
+                                <view class="li-left"> PM<sub>10</sub> </view>
+                                <view class="li-right"> 1 </view>
+                            </view>
+                            <view class="title-li">
+                                <view class="li-left">  PM<sub>2.5</sub> </view>
+                                <view class="li-right"> 0.8 </view>
+                            </view>
+                            <view class="title-li">
+                                <view class="li-left">  SO<sub>2</sub> </view>
+                                <view class="li-right"> 0.8 </view>
+                            </view>
+                        </view>
+                    </view>
+                </view>
+            </view>
+            
+            <!-- 灰色区域 -->
+            <view class="greyArea">
+                <view class="chart">
+                    图表
+                </view>
+                <view class="airButton air-flex">
+                    <view class="a-button" v-bind:class="[ item.code == buttonCode ? 'b_button' : '']" v-for="(item,index) in airButtonArr" :key="index" @click="airButtomChange(item)">  <view v-html="item.name" class="b-text"></view> </view>
+                </view>
+                <view class="airButton air-flex">
+                    <view class="a-button" style="width:30%;" v-bind:class="[ item.code == buttonCode ? 'b_button' : '']" v-for="(item,index) in buttonArr" :key="index" @click="airButtomChange(item)">  <view v-html="item.name" class="b-text"></view> </view>
                 </view>
             </view>
 
@@ -73,6 +166,7 @@
 <script>
 import calendar from "@/components/calendar/index.vue"
 import {getLastDateOfMonth,getDateYMD,getLastDateDay,getDateYM,addZero,dateAdd} from '@/utils/date.js'
+import { getAqiLevels} from '@/utils/aqi.js'
     export default {
         components: {
             calendar
@@ -88,6 +182,22 @@ import {getLastDateOfMonth,getDateYMD,getLastDateDay,getDateYM,addZero,dateAdd} 
                 endtime:'',
                 calendarData:[],
                 lowerShow:false,
+                airButtonArr:[
+                    {code:'aqi',name:'AQI'},
+                    {code:'pm25',name:'PM<sub>2.5</sub>'},
+                    {code:'pm10',name:'PM<sub>10</sub>'},
+                    {code:'o3',name:'O<sub>3</sub>'},
+                    {code:'so2',name:'SO<sub>2</sub>'},
+                    {code:'no2',name:'NO<sub>2</sub>'},
+                    {code:'co',name:'CO'},
+                    {code:'shuiwen',name:'水温'},
+                ],
+                buttonArr:[
+                    {code:'sidu',name:'相对湿度'},
+                    {code:'fen',name:'风速'},
+                    {code:'jisnghui',name:'降水量'},
+                ],
+                buttonCode:'aqi',
             }
         },
 		onLoad() {
@@ -99,10 +209,6 @@ import {getLastDateOfMonth,getDateYMD,getLastDateDay,getDateYM,addZero,dateAdd} 
             },3000)
             
 
-            // let date = new Date('2020/8');
-            // console.log( getDateYMD( getLastDateOfMonth(date)) )
-            // console.log(getLastDateDay(date))
-        // this.starttime = `${getDateYMDH(dateAdd(new Date(),'h',-18),'')}0000`;
             let date = new Date();
             this.starttime = `${getDateYM(dateAdd(new Date(),'d',-0),'')}01000000`;
             this.endtime = `${getDateYM(dateAdd(new Date(),'d',-0),'')}${addZero(getLastDateDay(new Date()))}000000`;
@@ -110,11 +216,140 @@ import {getLastDateOfMonth,getDateYMD,getLastDateDay,getDateYM,addZero,dateAdd} 
             this.chineseDateMonth = `${date.getFullYear()}年${date.getMonth()+1}月`
 
             this.queryData();
-		},
-		methods:{
-			golist(){
-				this.$navTo('navBar/list/list',{id:'123',name:'刘燃燃'})
+        },
+        computed: {
+            excellent(){//优
+                let count = 0;
+                this.calendarData.map(item=>{
+                    let aqilevel = getAqiLevels(item.aqi);
+                    if(aqilevel == '优' ){
+                        count+=1;
+                    }
+                })
+                return count
             },
+            good(){//良
+                let count = 0;
+                this.calendarData.map(item=>{
+                    let aqilevel = getAqiLevels(item.aqi);
+                    if(aqilevel == '良' ){
+                        count+=1;
+                    }
+                })
+                return count
+            },
+            light(){//轻度
+                let count = 0;
+                this.calendarData.map(item=>{
+                    let aqilevel = getAqiLevels(item.aqi);
+                    if(aqilevel == '轻度' ){
+                        count+=1;
+                    }
+                })
+                return count
+            },
+            moderate(){//中度
+                let count = 0;
+                this.calendarData.map(item=>{
+                    let aqilevel = getAqiLevels(item.aqi);
+                    if(aqilevel == '中度' ){
+                        count+=1;
+                    }
+                })
+                return count
+            },
+            severe(){//重度
+                let count = 0;
+                this.calendarData.map(item=>{
+                    let aqilevel = getAqiLevels(item.aqi);
+                    if(aqilevel == '重度' ){
+                        count+=1;
+                    }
+                })
+                return count
+            },
+            serious(){//严重
+                let count = 0;
+                this.calendarData.map(item=>{
+                    let aqilevel = getAqiLevels(item.aqi);
+                    if(aqilevel == '严重' ){
+                        count+=1;
+                    }
+                })
+                return count
+            },
+            pm25(){
+                let count = 0;
+                this.calendarData.map(item=>{
+                    if(item.primarypol == 'PM2.5' ){
+                        count+=1;
+                    }else if(item.primarypol == 'PM25' ){
+                        count+=1;
+                    }else if(item.primarypol == 'pm25' ){
+                        count+=1;
+                    }
+                })
+                return count
+            },
+            pm10(){
+                let count = 0;
+                this.calendarData.map(item=>{
+                    if(item.primarypol == 'PM10' ){
+                        count+=1;
+                    }else if(item.primarypol == 'pm10' ){
+                        count+=1;
+                    }
+                })
+                return count
+            },
+            o3(){
+                let count = 0;
+                this.calendarData.map(item=>{
+                    if(item.primarypol == 'O3-8h' ){
+                        count+=1;
+                    }else if(item.primarypol == 'O3' ){
+                        count+=1;
+                    }else if(item.primarypol == 'o3' ){
+                        count+=1;
+                    }
+                })
+                return count
+            },
+            so2(){
+                let count = 0;
+                this.calendarData.map(item=>{
+                    if(item.primarypol == 'SO2' ){
+                        count+=1;
+                    }else if(item.primarypol == 'so2' ){
+                        count+=1;
+                    }
+                })
+                return count
+            },
+            no2(){
+                let count = 0;
+                this.calendarData.map(item=>{
+                    if(item.primarypol == 'NO2' ){
+                        count+=1;
+                    }else if(item.primarypol == 'no2' ){
+                        count+=1;
+                    }
+                })
+                return count
+            },
+            co(){
+                let count = 0;
+                this.calendarData.map(item=>{
+                    if(item.primarypol == 'CO' ){
+                        count+=1;
+                    }else if(item.primarypol == 'co' ){
+                        count+=1;
+                    }
+                })
+                return count
+            }
+        },
+		methods:{
             dateChange(e){
                 //返回日期
                 let date = new Date(e.date);
@@ -135,7 +370,6 @@ import {getLastDateOfMonth,getDateYMD,getLastDateDay,getDateYM,addZero,dateAdd} 
                 this.queryData();
             },
             backToday(){
-                console.log('执行了')
                 this.$refs.calendar.backToday();//返回今天
             },
             upper(){//上个月
@@ -154,9 +388,14 @@ import {getLastDateOfMonth,getDateYMD,getLastDateDay,getDateYM,addZero,dateAdd} 
                 this.$http('/airMoniData/getCityMoniListByLongTime',params,'Get').then(res=>{
                     if(res.data.result && res.data.result.length>0){
                         this.calendarData = res.data.result
-                        console.log(this.calendarData)
                     }
                 })
+            },
+            airButtomChange(item){
+                if( this.buttonCode !== item.code){
+                    this.buttonCode = item.code
+                }
+                
             }
 		}
         
@@ -234,6 +473,7 @@ import {getLastDateOfMonth,getDateYMD,getLastDateDay,getDateYM,addZero,dateAdd} 
     }
     .month{
         width: 100vw;
+        padding-bottom: 5px;
         .month-title{
             height: 40px;
             line-height: 40px;
@@ -261,14 +501,227 @@ import {getLastDateOfMonth,getDateYMD,getLastDateDay,getDateYM,addZero,dateAdd} 
                     align-items: center;
                     .level-text{
                          margin: 0 5px;
+                         color: #75797a;
                     }
                     .level-circular{
                         width: 15px;
                         height: 15px;
                         border-radius: 50%;
-                    
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        .texts{
+                            font-size: 10px;
+                            color: #FFF;
+                        }
                     }
                 }
+            }
+        }
+        .primarypols{
+            width: 100%;
+            display: flex;
+            .primarypols-left{
+                width: 90px;
+                height: 30px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            .primarypols-right{
+                width: calc(100% - 90px);
+                min-height: 30px;
+                display: flex;
+                // justify-content: center;
+                align-items: center;
+                flex-wrap: wrap;
+                .primarypols-li{
+                    display: flex;
+                    height: 100%;
+                    align-items: center;
+                    .primarypols-text{
+                         margin: 0 4px;
+                         color: #75797a;
+                         font-size: 10px;
+                    }
+                    .primarypols-circular{
+                        width: 15px;
+                        height: 15px;
+                        border-radius: 50%;
+                        background: #5c94ff;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        .texts{
+                            font-size: 10px;
+                            color: #FFF;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    .dayInfo{
+        height: 155px;
+        width: 100vw;
+        background: #FFF;
+        display: flex;
+        .dayInfo-left{
+            width: 145px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            .left-box{
+                width: 110px;
+                height: 110px;
+                background: #ffec01;
+                z-index: 1;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                .border-white{
+                    width: 100px;
+                    height: 100px;
+                    background: #FFF;
+                    z-index: 2;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    .box-content{
+                        width: 96px;
+                        height: 96px;
+                        background: #ffec01;
+                        z-index: 3;
+                        .box-top{
+                            height: 18px;
+                            width: 100%;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            .box-circular{
+                                height: 8px;
+                                width: 8px;
+                                border-radius: 50%;
+                                background: #FFF;
+                            }
+                        }
+                        .box-center{
+                            height: calc(100% - 48px );
+                            width: 100%;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            .box-font{
+                                color: #fff;
+                                font-size: 24px;
+                            }
+                        }
+                        .box-bottom{
+                            height: 30px;
+                            width: 100%;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            .box-size{
+                                color: #FFF;
+                                font-size: 12px;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .dayInfo-right{
+            width: calc(100% - 145px);
+            height: 100%;
+            display: flex;
+            align-items: center;
+            .right-title{
+                width: 100%;
+                height: 110px;
+                padding: 0 5px;
+                // background: chartreuse;
+                .title-top{
+                    height: 32px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    .title-top-left{
+                        font-size: 18px;
+                        color: #262626;
+                    }
+                    .title-top-right{
+                        font-size: 12px;
+                        color: #777777;
+                    }
+                }
+                .title-center{
+                    height: 30px;
+                    line-height: 30px;
+                    font-size: 14px;
+                    color: #262626;
+                }
+                .title-bottom{
+                    height: calc(100% - 62px );
+                    width: 100%;
+                    display: flex;
+                    flex-wrap: wrap;
+                    .title-li{
+                        width: 30%;
+                        height: 30px;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        .li-left{
+                            padding-right: 5px;
+                            font-size: 10px;
+                        }
+                        .li-right{
+                            padding-left: 5px;
+                            font-size: 12px;
+                            color: #000;
+                        }
+                    }
+                }
+            }
+            
+        }
+    }
+    .greyArea{
+        background: #f5f6f8;
+        width: 100vw;
+        padding: 0 10px;
+        .chart{
+            height: 200px;
+            width: 100%;
+            border: 1px solid cadetblue;
+        }
+        .air-flex{
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            .b-text{
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                font-size: 10px;
+            }
+        }
+        .airButton{
+            height: 42px;
+            .a-button{
+                height: 30px;
+                width: 11.5%;
+                border-radius: 5px;
+                background: #FFF;
+                display: flex;
+                justify-content: center;
+                color: #686868;
+            }
+            .b_button{
+                color: #FFF;
+                background: #1f8cf1;
             }
         }
     }
