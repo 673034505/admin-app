@@ -3,7 +3,12 @@
          <view class="container">
             <view class="navTitle">
                 <view class="nav-city">
-                    城市
+                    <picker @change="PickerChange" :value="cityIndex" :range="cityArr" range-key="name">
+                        <view class="picker">
+                            {{cityArr[cityIndex].name}}<u-icon name="arrow-down"></u-icon>
+                        </view>
+                        
+                    </picker>
                 </view>
                 <view class="nav-date">
                     <view class="date-box" >
@@ -176,12 +181,11 @@ import { getAqiLevels,getAqiColor} from '@/utils/aqi.js'
                 items:50,
                 TabCur: 0,
                 scrollLeft: 0,
-                chineseDateMonth:'',
-                citycode:'130500',//城市编码
-                starttime:'',
-                endtime:'',
-                calendarData:[],
-                lowerShow:false,
+                chineseDateMonth:'',//显示当前年与月
+                starttime:'',//查询当月开始时间 格式YYYYMMDDhhmmss
+                endtime:'',//查询当月结束时间 格式YYYYMMDDhhmmss
+                calendarData:[],//当月时间数组
+                lowerShow:false,//如果为当年当月右侧图表不显示
                 airButtonArr:[
                     {code:'aqi',name:'AQI'},
                     {code:'pm25',name:'PM<sub>2.5</sub>'},
@@ -201,7 +205,11 @@ import { getAqiLevels,getAqiColor} from '@/utils/aqi.js'
                 strObj:{'PM2.5':`PM<sub>2.5</sub>`,'PM25':'PM<sub>2.5</sub>','PM10':'PM<sub>10</sub>','SO2':`SO<sub>2</sub>`,'NO2':'NO<sub>2</sub>','o3':'O<sub><sub>3</sub>','O3-8h':'O<sub><sub>3</sub>','O3':'O<sub><sub>3</sub>','-':'-'},
                 returnDate:'',//当前日期
                 airObj:{},
-                cityname:'邢台市'
+                cityname:'邢台市',
+                citycode:'130500',//城市编码
+                cityIndex: 0,
+                cityArr:[{code:'130500',name:"邢台市" } ,{code:'130400',name:"邯郸市" }],
+                dayDataArr:[],
             }
         },
 		onLoad() {
@@ -354,6 +362,15 @@ import { getAqiLevels,getAqiColor} from '@/utils/aqi.js'
             }
         },
 		methods:{
+            PickerChange(e) {
+                if( this.cityIndex == e.detail.value){
+                    return
+                }
+                this.cityIndex = e.detail.value
+                this.citycode = this.cityArr[e.detail.value].code;
+                this.cityname = this.cityArr[e.detail.value].name;
+               
+			},
             queryData(){//查询数据
                 let params = {
                     starttime:this.starttime,
@@ -365,14 +382,36 @@ import { getAqiLevels,getAqiColor} from '@/utils/aqi.js'
                     if(res.data.result && res.data.result.length>0){
                         this.calendarData = res.data.result;
                         this.selectDate();
+                        this.queryDayData();
                     }
                 })
+            },
+            queryDayData(){//查询切换日期
+                let date = new Date(this.returnDate);
+                
+                let starttime = `${getDateYMD(dateAdd(new Date(this.returnDate),'d',-0),'')}000000`;
+                let endtime = `${getDateYMD(dateAdd(new Date(this.returnDate),'d',-0),'')}230000`;
+                let params = {
+                    starttime:starttime,
+                    endtime:endtime,
+                    type:'hour',
+                    citycode:this.citycode
+                }
+                this.$http('/airMoniData/getCityMoniListByLongTime',params,'Get').then(res=>{
+                    if(res.data.result && res.data.result.length>0){
+                        this.dayDataArr = res.data.result;
+                        this.setBarEchart();
+                    }
+                })
+                console.log(params)
+            },
+            setBarEchart(){//设置折线图
+
             },
             dateChange(e){
                 //返回日期
                 let date = new Date(e.date);
                 this.returnDate = e.date;
-                // console.log(e)
                 this.selectDate();
             },
 
@@ -439,7 +478,6 @@ import { getAqiLevels,getAqiColor} from '@/utils/aqi.js'
                         datatime:obj.datatime.split(' ')[0]
                     }
                 }
-                // console.log(this.returnDate,date.getDate())  2013.22  0.88 2012.34
             },
             airButtomChange(item){
                 if( this.buttonCode !== item.code){
@@ -462,6 +500,13 @@ import { getAqiLevels,getAqiColor} from '@/utils/aqi.js'
         .nav-city{//城市
             width: 70px;
             height: 100%;
+            .picker{
+                height: 38px;
+                width: 100%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
         }
         .nav-date{//日期
             width: calc(100% - 170px );

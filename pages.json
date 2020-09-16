@@ -84,7 +84,9 @@
         }
 	    ,{
             "path" : "pages/list/airCalendar/airCalendar",
-            "style" : {}
+            "style" : {
+				"navigationBarTitleText": "空气质量日历"
+			}
         }
     ],
 	"easycom": {

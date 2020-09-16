@@ -13,7 +13,10 @@
                 <view class="content" ref="btn"   @scroll="scroll">
 					<view id="sollop">
                         <view v-if="TabCur == 0">
-                        11
+                            
+                            <template v-for="(item,index) in pagelist">
+                                <u-button type="primary" :key="index" @click="navigator(item.url)">{{item.name}} </u-button>    
+                            </template>
                         </view>
                         <view v-if="TabCur == 1">
                             
@@ -76,6 +79,7 @@
                 scrollLeft: 0,
                 isSupport:true,
                 startTop:0,
+                pagelist:[{name:'空气质量日历',url:'list/airCalendar/airCalendar'}]
             }
         },
 		onLoad() {
@@ -119,8 +123,11 @@
 				  pullToRefresh: {  
 				    support: this.isSupport,
 				  }  
-				});  
-			},
+                });  
+            },
+            navigator(url){
+                this.$navTo(url);
+            }
         },
         onPullDownRefresh() {
             setTimeout(function(){
