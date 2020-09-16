@@ -15,7 +15,9 @@
                         <view v-if="TabCur == 0">
                             
                             <template v-for="(item,index) in pagelist">
-                                <u-button type="primary" :key="index" @click="navigator(item.url)">{{item.name}} </u-button>    
+                                <div :key="index" class="botts">
+                                    <u-button type="primary"  @click="navigator(item.url)">{{item.name}} </u-button>     
+                                </div>   
                             </template>
                         </view>
                         <view v-if="TabCur == 1">
@@ -79,7 +81,10 @@
                 scrollLeft: 0,
                 isSupport:true,
                 startTop:0,
-                pagelist:[{name:'空气质量日历',url:'list/airCalendar/airCalendar'}]
+                pagelist:[
+                    {name:'空气质量日历',url:'list/airCalendar/airCalendar'},
+                    {name:'空气质量日历',url:'list/airCalendar1/airCalendar1'},
+                ]
             }
         },
 		onLoad() {
@@ -180,7 +185,9 @@
         position: relative;
         overflow: hidden;
         overflow-y: auto;
-		
+		.botts{
+            margin: 10px 0;
+        }
     }
     .item{
         width: 100%;

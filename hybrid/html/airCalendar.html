@@ -30,7 +30,8 @@
 	<script src="./js/date.js"></script>
 	<script src="./js/aqi.js"></script>
     <script src="./js/vue.js" type="text/javascript" charset="utf-8"></script>
-	<script src="./js/vant.min.js"></script>
+    <script src="./js/vant.min.js"></script>
+	<script src="./js/echarts.min.js"></script>
 	<script src="./js/axios.min.js"></script>
 </head>
 <body >
@@ -224,9 +225,7 @@
             <!-- 灰色区域 -->
             <div class="greyArea">
                 <div class="chart">
-                    <!-- #ifdef APP-PLUS || H5 -->
-                    <!-- <div @click="echarts.onClick" :prop="option" :change:prop="echarts.updateEcharts" id="echarts1" class="echarts" ref="echarts1"></div> -->
-                    <!-- #endif -->
+                    <div id="echarts1" class="echarts" ref="echarts1"></div>
                 </div>
                 <div class="airButton air-flex">
                     <div class="a-button" v-bind:class="[ item.code == buttonCode ? 'b_button' : '']" v-for="(item,index) in airButtonArr" :key="index" @click="airButtomChange(item)">  <div v-html="item.html" class="b-text"></div> </div>
@@ -327,6 +326,7 @@
         methods: {
             ConfirmChange(e){//确定
                 if(e.code == this.citycode){
+                    this.popupShows = false;
                     return 
                 }
                 this.citycode = e.code;
@@ -433,7 +433,6 @@
                                 {
                                     let date = new Date(params)
                                     let str =  `${addZero(date.getHours())}:00`;
-                                    console.log(str)
                                     return str
                                 }
                         },
@@ -454,7 +453,6 @@
                         itemStyle: {
                             normal: {
                                 color: function(params) {
-                                    console.log( getPollLevelColor(_self.buttonCode,params.data[1],'hour'),'=-====')
                                     return getPollLevelColor(_self.buttonCode,params.data[1],'hour')
                                 },
                             }
@@ -462,6 +460,9 @@
 						data: arr
 					}]
                 }
+                var myChart = echarts.init(document.getElementById('echarts1'));
+                 // 使用刚指定的配置项和数据显示图表。
+                 myChart.setOption(this.option);
             },
             dateChange(e){
                 //返回日期
@@ -523,6 +524,7 @@
                         datatime:obj.datatime.split(' ')[0]
                     }
                 }
+                _self.queryDayData();
             },
             airButtomChange(item){
                 if( this.buttonCode !== item.code){

@@ -88,6 +88,10 @@
 				"navigationBarTitleText": "空气质量日历"
 			}
         }
+        ,{
+            "path" : "pages/list/airCalendar1/airCalendar1",
+            "style" : {}
+        }
     ],
 	"easycom": {
 		// npm安装的方式不需要前面的"@/"，下载安装的方式需要"@/"
