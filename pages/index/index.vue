@@ -156,13 +156,15 @@
             <!-- 灰色区域 -->
             <view class="greyArea">
                 <view class="chart">
-                    图表
+                    <!-- #ifdef APP-PLUS || H5 -->
+                    <view @click="echarts.onClick" :prop="option" :change:prop="echarts.updateEcharts" id="echarts1" class="echarts" ref="echarts1"></view>
+                    <!-- #endif -->
                 </view>
                 <view class="airButton air-flex">
-                    <view class="a-button" v-bind:class="[ item.code == buttonCode ? 'b_button' : '']" v-for="(item,index) in airButtonArr" :key="index" @click="airButtomChange(item)">  <view v-html="item.name" class="b-text"></view> </view>
+                    <view class="a-button" v-bind:class="[ item.code == buttonCode ? 'b_button' : '']" v-for="(item,index) in airButtonArr" :key="index" @click="airButtomChange(item)">  <view v-html="item.html" class="b-text"></view> </view>
                 </view>
                 <view class="airButton air-flex">
-                    <view class="a-button" style="width:30%;" v-bind:class="[ item.code == buttonCode ? 'b_button' : '']" v-for="(item,index) in buttonArr" :key="index" @click="airButtomChange(item)">  <view v-html="item.name" class="b-text"></view> </view>
+                    <view class="a-button" style="width:30%;" v-bind:class="[ item.code == buttonCode ? 'b_button' : '']" v-for="(item,index) in buttonArr" :key="index" @click="airButtomChange(item)">  <view v-html="item.html" class="b-text"></view> </view>
                 </view>
             </view>
 
@@ -170,8 +172,8 @@
 </template>
 <script>
 import calendar from "@/components/calendar/index.vue"
-import {getLastDateOfMonth,getDateYMD,getLastDateDay,getDateYM,addZero,dateAdd} from '@/utils/date.js'
-import { getAqiLevels,getAqiColor} from '@/utils/aqi.js'
+import {getLastDateOfMonth,getDateYMD,getLastDateDay,getDateYM,addZero,dateAdd,getDateYMDHMS} from '@/utils/date.js'
+import { getAqiLevels,getAqiColor,getPollLevelColor} from '@/utils/aqi.js'
     export default {
         components: {
             calendar
@@ -187,19 +189,19 @@ import { getAqiLevels,getAqiColor} from '@/utils/aqi.js'
                 calendarData:[],//当月时间数组
                 lowerShow:false,//如果为当年当月右侧图表不显示
                 airButtonArr:[
-                    {code:'aqi',name:'AQI'},
-                    {code:'pm25',name:'PM<sub>2.5</sub>'},
-                    {code:'pm10',name:'PM<sub>10</sub>'},
-                    {code:'o3',name:'O<sub>3</sub>'},
-                    {code:'so2',name:'SO<sub>2</sub>'},
-                    {code:'no2',name:'NO<sub>2</sub>'},
-                    {code:'co',name:'CO'},
-                    {code:'shuiwen',name:'水温'},
+                    {code:'aqi',name:'AQI',html:'AQI'},
+                    {code:'pm25',name:'PM2.5',html:'PM<sub>2.5</sub>'},
+                    {code:'pm10',name:'PM10',html:'PM<sub>10</sub>'},
+                    {code:'o3',name:'O3',html:'O<sub>3</sub>'},
+                    {code:'so2',name:'SO2',html:'SO<sub>2</sub>'},
+                    {code:'no2',name:'NO2',html:'NO<sub>2</sub>'},
+                    {code:'co',name:'CO',html:'CO'},
+                    {code:'shuiwen',name:'水温',html:'水温'},
                 ],
                 buttonArr:[
-                    {code:'sidu',name:'相对湿度'},
-                    {code:'fen',name:'风速'},
-                    {code:'jisnghui',name:'降水量'},
+                    {code:'sidu',name:'相对湿度',html:'相对湿度'},
+                    {code:'fen',name:'风速',html:'风速'},
+                    {code:'jisnghui',name:'降水量',html:'降水量'},
                 ],
                 buttonCode:'aqi',
                 strObj:{'PM2.5':`PM<sub>2.5</sub>`,'PM25':'PM<sub>2.5</sub>','PM10':'PM<sub>10</sub>','SO2':`SO<sub>2</sub>`,'NO2':'NO<sub>2</sub>','o3':'O<sub><sub>3</sub>','O3-8h':'O<sub><sub>3</sub>','O3':'O<sub><sub>3</sub>','-':'-'},
@@ -210,6 +212,8 @@ import { getAqiLevels,getAqiColor} from '@/utils/aqi.js'
                 cityIndex: 0,
                 cityArr:[{code:'130500',name:"邢台市" } ,{code:'130400',name:"邯郸市" }],
                 dayDataArr:[],
+                option:{},//echart 图表数据
+                echatName:'AQI',
             }
         },
 		onLoad() {
@@ -387,8 +391,9 @@ import { getAqiLevels,getAqiColor} from '@/utils/aqi.js'
                 })
             },
             queryDayData(){//查询切换日期
+
                 let date = new Date(this.returnDate);
-                
+                console.log(this.returnDate)                
                 let starttime = `${getDateYMD(dateAdd(new Date(this.returnDate),'d',-0),'')}000000`;
                 let endtime = `${getDateYMD(dateAdd(new Date(this.returnDate),'d',-0),'')}230000`;
                 let params = {
@@ -406,6 +411,85 @@ import { getAqiLevels,getAqiColor} from '@/utils/aqi.js'
                 console.log(params)
             },
             setBarEchart(){//设置折线图
+                //因为有可能日期不是全的
+                var t = 0;
+                let arr = [];
+                var endtime = new Date( `${this.returnDate} 23:00:00` );
+                let startInitialDate = this.returnDate;
+                while(dateAdd(new Date(startInitialDate+" 00:00:00"),'h',t)<=endtime)//遍历日期时间
+                {
+                var times =getDateYMDHMS(dateAdd(new Date(startInitialDate+" 00:00:00"),'h',t));//获得日期
+                var foreValue 
+                    for(let i=0;i<this.dayDataArr.length;i++)//遍历模型下面的数组
+                    {
+                        if(times==this.dayDataArr[i]["datatime"])//根据时间查找当天的预报值
+                        {
+                            foreValue=this.dayDataArr[i][this.buttonCode];
+                        break;
+                        }else{
+                            foreValue = null;
+                        }
+                    }
+                    arr.push([times,foreValue])
+                    t=t+1;
+                }
+                let _self = this;
+                this.option = {
+                    tooltip: {
+                        trigger: 'axis',
+                        confine:true,
+                    },
+                    grid: {  
+                        left: '10%',  
+                        right: '8%', 
+                        top: '10%',  
+                        bottom: '10%',
+                    },
+					xAxis: {
+                        type : 'time',
+                        axisLine:{lineStyle:{color:"#9898a4"}},
+                        splitLine:{show:false},
+                        axisLabel: {
+                                interval: 'auto',
+                                // showMaxLabel:false,
+                                formatter: (params,index)=>
+                                {
+                                    let date = new Date(params)
+                                    let str =  `${addZero(date.getHours())}:00`;
+                                    console.log(str)
+                                    return str
+                                }
+                        },
+                    },
+                    //9898a4
+					yAxis: {
+                        axisLine:{show:false, lineStyle:{color:"#9898a4"}},
+                        axisTick:{show:false},
+                        splitLine:{
+                            lineStyle:{
+                                type:'dashed'
+                            }
+                        }
+                    },
+					series: [{
+						name: this.echatName,
+                        type: 'bar',
+                        // color: function(params){
+                        //     console.log(params)
+                        //     return  getPollLevelColor(_self.buttonCode,params.data[1],'hour')
+                        // },
+                        itemStyle: {
+                            normal: {
+                                color: function(params) {
+                                    console.log( getPollLevelColor(_self.buttonCode,params.data[1],'hour'),'=-====')
+                                    return getPollLevelColor(_self.buttonCode,params.data[1],'hour')
+                                },
+                            }
+                        },
+						data: arr
+					}]
+                }
+                
 
             },
             dateChange(e){
@@ -481,13 +565,54 @@ import { getAqiLevels,getAqiColor} from '@/utils/aqi.js'
             },
             airButtomChange(item){
                 if( this.buttonCode !== item.code){
-                    this.buttonCode = item.code
+                    this.buttonCode = item.code;
+                    this.echatName = item.name;
+                    this.setBarEchart()
                 }
                 
-            }
+            },
+            
 		}
         
     }
+</script>
+
+<script module="echarts" lang="renderjs">
+	var myChart
+	export default {
+		mounted() {
+			if (typeof window.echarts === 'function') {
+				this.initEcharts()
+			} else {
+				// 动态引入较大类库避免影响页面展示
+				const script = document.createElement('script')
+				// view 层的页面运行在 www 根目录，其相对路径相对于 www 计算
+				script.src = 'static/echarts.js'
+				script.onload = this.initEcharts.bind(this)
+				document.head.appendChild(script)
+			}
+		},
+		methods: {
+			initEcharts() {
+                myChart = echarts.init(document.getElementById('echarts1'))
+				// 观测更新的数据在 view 层可以直接访问到
+				myChart.setOption(this.option)
+			},
+			updateEcharts(newValue, oldValue, ownerInstance, instance) {
+                // 监听 service 层数据变更
+                if(myChart){
+                    console.log();
+                    myChart.setOption(newValue)
+                }
+			},
+			onClick(event, ownerInstance) {
+				// 调用 service 层的方法
+				// ownerInstance.callMethod('onViewClick', {
+				// 	test: event
+				// })
+			}
+		}
+	}
 </script>
 <style lang="less" scoped>
 
@@ -790,7 +915,11 @@ import { getAqiLevels,getAqiColor} from '@/utils/aqi.js'
         .chart{
             height: 200px;
             width: 100%;
-            border: 1px solid cadetblue;
+            // border: 1px solid cadetblue;
+            .echarts{
+                height: 100%;
+                width: 100%;
+            }
         }
         .air-flex{
             display: flex;

@@ -22,6 +22,7 @@
 			var _seft = this;
 			setTimeout(()=>{
 				//模拟动态数据
+				let colorList  = [ '#000','#aaa','#ddd','#www','#qqq','#ffsfsa']
 				_seft.option = {
 					show:"chart1",
 					title: {
@@ -41,8 +42,16 @@
 					yAxis: {},
 					series: [{
 						name: '销量',
-						type: 'line',
-						data: [5, 20, 36, 10, 10, 20]
+						type: 'bar',
+						data: [5, 20, 36, 10, 10, 20],
+						itemStyle: {
+                            normal: {
+                                color: function(params) {
+									console.log('ap')
+									return colorList[params.dataIndex];
+                                },
+                            }
+                        },
 					}]
 				}
 				_seft.option1 = {
@@ -65,7 +74,8 @@
 					series: [{
 						name: '销量122',
 						type: 'bar',
-						data: [5, 20, 36, 10, 10, 20]
+						data: [5, 20, 36, 10, 10, 20],
+						
 					}]
 				}
 			},1000)

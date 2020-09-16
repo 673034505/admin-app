@@ -1,9 +1,81 @@
-.page{
-    min-height: 100vh;
-    overflow: hidden;
-    .bg{
-        width: 100%;
-        height: 30px;
-        background: yellowgreen;
+// .page{
+//     min-height: 100vh;
+//     overflow: hidden;
+//     .bg{
+//         width: 100%;
+//         height: 30px;
+//         background: yellowgreen;
+//     }
+// }
+
+.calendar{
+    width: 100vw;
+    .title{
+        display: flex;
+        margin-left: 50px;
+        .nex{
+            width: 60px;
+            height: 40px;
+            text-align: center;
+            line-height: 40px;
+        }
+    }
+    .week-header{
+        margin: 0;
+        padding: 10px 0;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-around;
+        .month{
+            display: inline-block;
+            width: 13.6%;
+            text-align: center;
+        }
+    }
+    .week-date{
+        padding: 0;
+        background: #ffffff;
+        margin: 0;
+        display: flex;
+        flex-wrap: wrap;
+        font-size: 12px;
+        justify-content: space-around;
+        .every-day{
+            display: inline-block;
+            width: 14.2%;
+            padding-bottom: 5px;
+            .every-box{
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: 80%;
+                height: 45px;
+                margin: 0 10%;
+                padding: 0 5px;
+                flex-wrap: wrap;
+                background: #eee;
+                .top-days{
+                    height: 20px;
+                    line-height: 20px;
+                    width: 100%;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                }
+                .bottom-primarypol{
+                    height: 30px;
+                    line-height: 10px;
+                    width: 100%;
+                    font-size: 8px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    
+                }
+            }
+            .dateSelect{
+                border: 1px solid #92a7f6;
+            }
+        }
     }
 }

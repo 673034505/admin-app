@@ -1,0 +1,339 @@
+.page{
+    min-height: 100vh;
+    overflow: hidden;
+    
+}
+.container{
+    height: 100vh;
+    .navTitle{
+        height: 40px;
+        width: 100vw;
+        display: flex;
+        .nav-city{//城市
+            width: 70px;
+            height: 100%;
+            .picker{
+                height: 38px;
+                width: 100%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+        }
+        .nav-date{//日期
+            width: calc(100% - 170px );
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            .date-box{
+                width: 150px;
+                height: 100%;
+                display: flex;
+                justify-content: center;
+                .date-left{
+                    height: 100%;
+                    width: 30px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                }
+                .circular{
+                    height: 25px;
+                    width: 25px;
+                    border-radius: 50%;
+                    border: 1px solid #eee;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                }
+                .date-center{
+                     height: 100%;
+                     width: calc(100% - 60px);
+                     display: flex;
+                     justify-content: center;
+                     align-items: center;
+                     color: #000;
+                     font-size: 14px;
+                     font-weight: 700;
+                }
+                .date-right{
+                    height: 100%;
+                    width: 30px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                }
+            }
+        }
+        .nav-today{//返回今天
+            width: 100px;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            .nav-button{
+                width: 80px;
+                height: 30px;
+                font-size: 12px;
+            }
+        }
+    }
+    .month{
+        width: 100vw;
+        padding-bottom: 5px;
+        .month-title{
+            height: 40px;
+            line-height: 40px;
+            width: 100%;
+            border-bottom: 1px solid #b2b2b2;
+            .title-text{
+                padding-left: 10px;
+            }
+        }
+        .title-level{
+            width: 100vw;
+            height: 30px;
+            line-height: 30px;
+            display: flex;
+            .level-left{
+                padding-left: 10px;
+                width: 70px;
+            }
+            .level-right{
+                width: calc(100% - 70px );
+                height: 100%;
+                display: flex;
+                .level-li{
+                    display: flex;
+                    align-items: center;
+                    .level-text{
+                         margin: 0 5px;
+                         color: #75797a;
+                    }
+                    .level-circular{
+                        width: 15px;
+                        height: 15px;
+                        border-radius: 50%;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        .texts{
+                            font-size: 10px;
+                            color: #FFF;
+                        }
+                    }
+                }
+            }
+        }
+        .primarypols{
+            width: 100%;
+            display: flex;
+            .primarypols-left{
+                width: 90px;
+                height: 30px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            .primarypols-right{
+                width: calc(100% - 90px);
+                min-height: 30px;
+                display: flex;
+                // justify-content: center;
+                align-items: center;
+                flex-wrap: wrap;
+                .primarypols-li{
+                    display: flex;
+                    height: 100%;
+                    align-items: center;
+                    .primarypols-text{
+                         margin: 0 4px;
+                         color: #75797a;
+                         font-size: 10px;
+                    }
+                    .primarypols-circular{
+                        width: 15px;
+                        height: 15px;
+                        border-radius: 50%;
+                        background: #5c94ff;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        .texts{
+                            font-size: 10px;
+                            color: #FFF;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    .dayInfo{
+        height: 155px;
+        width: 100vw;
+        background: #FFF;
+        display: flex;
+        .dayInfo-left{
+            width: 145px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            .left-box{
+                width: 110px;
+                height: 110px;
+                background: #eee;
+                z-index: 1;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                .border-white{
+                    width: 100px;
+                    height: 100px;
+                    background: #FFF;
+                    z-index: 2;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    .box-content{
+                        width: 96px;
+                        height: 96px;
+                        background: #eee;
+                        z-index: 3;
+                        .box-top{
+                            height: 18px;
+                            width: 100%;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            .box-circular{
+                                height: 8px;
+                                width: 8px;
+                                border-radius: 50%;
+                                background: #FFF;
+                            }
+                        }
+                        .box-center{
+                            height: calc(100% - 48px );
+                            width: 100%;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            .box-font{
+                                color: #fff;
+                                font-size: 24px;
+                            }
+                        }
+                        .box-bottom{
+                            height: 30px;
+                            width: 100%;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            .box-size{
+                                color: #FFF;
+                                font-size: 12px;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .dayInfo-right{
+            width: calc(100% - 145px);
+            height: 100%;
+            display: flex;
+            align-items: center;
+            .right-title{
+                width: 100%;
+                height: 110px;
+                padding: 0 5px;
+                // background: chartreuse;
+                .title-top{
+                    height: 32px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    .title-top-left{
+                        font-size: 18px;
+                        color: #262626;
+                    }
+                    .title-top-right{
+                        font-size: 12px;
+                        color: #777777;
+                    }
+                }
+                .title-center{
+                    height: 30px;
+                    line-height: 30px;
+                    font-size: 14px;
+                    color: #262626;
+                }
+                .title-bottom{
+                    height: calc(100% - 62px );
+                    width: 100%;
+                    display: flex;
+                    flex-wrap: wrap;
+                    .title-li{
+                        width: 30%;
+                        height: 30px;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        .li-left{
+                            padding-right: 5px;
+                            font-size: 10px;
+                        }
+                        .li-right{
+                            padding-left: 5px;
+                            font-size: 12px;
+                            color: #000;
+                        }
+                    }
+                }
+            }
+            
+        }
+    }
+    .greyArea{
+        background: #f5f6f8;
+        width: 100vw;
+        padding: 0 10px;
+        .chart{
+            height: 200px;
+            width: 100%;
+            // border: 1px solid cadetblue;
+            .echarts{
+                height: 100%;
+                width: 100%;
+            }
+        }
+        .air-flex{
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            .b-text{
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                font-size: 10px;
+            }
+        }
+        .airButton{
+            height: 42px;
+            .a-button{
+                height: 30px;
+                width: 11.5%;
+                border-radius: 5px;
+                background: #FFF;
+                display: flex;
+                justify-content: center;
+                color: #686868;
+            }
+            .b_button{
+                color: #FFF;
+                background: #1f8cf1;
+            }
+        }
+    }
+}
