@@ -93,13 +93,13 @@
             <!-- 当天城市信息 -->
             <view class="dayInfo">
                 <view class="dayInfo-left">
-                    <view class="left-box">
+                    <view class="left-box" :style="{backgroundColor:airObj.backgroundColor}">
                         <view class="border-white">
-                            <view class="box-content">
+                            <view class="box-content" :style="{backgroundColor:airObj.backgroundColor}">
                                 <view class="box-top"> <view class="box-circular"> </view> </view>
-                                <view class="box-center"> <view class="box-font"> 83 </view>  </view>
+                                <view class="box-center"> <view class="box-font"> {{airObj.aqi}} </view>  </view>
                                 <view class="box-bottom">
-                                    <view class="box-size">AQI: 良</view>
+                                    <view class="box-size">AQI: {{airObj.leave}}</view>
                                 </view>
                             </view>
                         </view>
@@ -109,39 +109,39 @@
                     <view class="right-title">
                         <view class="title-top">
                             <view class="title-top-left">
-                                邯郸市
+                                {{cityname}}
                             </view>
                             <view class="title-top-right">
-                                2020-09-15
+                                {{airObj.datatime}}
                             </view>
                         </view>
                         <view class="title-center">
-                            细颗粒物: PM<sub>2.5</sub>
+                            细颗粒物: <text v-html="airObj.primarypols"></text>
                         </view>
                         <view class="title-bottom">
                             <view class="title-li">
                                 <view class="li-left"> CO </view>
-                                <view class="li-right"> 0.8 </view>
+                                <view class="li-right"> {{airObj.co}} </view>
                             </view>
                             <view class="title-li">
                                 <view class="li-left"> NO<sub>2</sub> </view>
-                                <view class="li-right"> 0.8 </view>
+                                <view class="li-right"> {{airObj.no2}} </view>
                             </view>
                             <view class="title-li">
                                 <view class="li-left"> O<sub>3</sub>_8h </view>
-                                <view class="li-right"> 26 </view>
+                                <view class="li-right"> {{airObj.o3}} </view>
                             </view>
                             <view class="title-li">
                                 <view class="li-left"> PM<sub>10</sub> </view>
-                                <view class="li-right"> 1 </view>
+                                <view class="li-right"> {{airObj.pm10}} </view>
                             </view>
                             <view class="title-li">
                                 <view class="li-left">  PM<sub>2.5</sub> </view>
-                                <view class="li-right"> 0.8 </view>
+                                <view class="li-right"> {{airObj.pm25}} </view>
                             </view>
                             <view class="title-li">
                                 <view class="li-left">  SO<sub>2</sub> </view>
-                                <view class="li-right"> 0.8 </view>
+                                <view class="li-right"> {{airObj.so2}} </view>
                             </view>
                         </view>
                     </view>
@@ -166,7 +166,7 @@
 <script>
 import calendar from "@/components/calendar/index.vue"
 import {getLastDateOfMonth,getDateYMD,getLastDateDay,getDateYM,addZero,dateAdd} from '@/utils/date.js'
-import { getAqiLevels} from '@/utils/aqi.js'
+import { getAqiLevels,getAqiColor} from '@/utils/aqi.js'
     export default {
         components: {
             calendar
@@ -198,6 +198,10 @@ import { getAqiLevels} from '@/utils/aqi.js'
                     {code:'jisnghui',name:'降水量'},
                 ],
                 buttonCode:'aqi',
+                strObj:{'PM2.5':`PM<sub>2.5</sub>`,'PM25':'PM<sub>2.5</sub>','PM10':'PM<sub>10</sub>','SO2':`SO<sub>2</sub>`,'NO2':'NO<sub>2</sub>','o3':'O<sub><sub>3</sub>','O3-8h':'O<sub><sub>3</sub>','O3':'O<sub><sub>3</sub>','-':'-'},
+                returnDate:'',//当前日期
+                airObj:{},
+                cityname:'邢台市'
             }
         },
 		onLoad() {
@@ -214,7 +218,7 @@ import { getAqiLevels} from '@/utils/aqi.js'
             this.endtime = `${getDateYM(dateAdd(new Date(),'d',-0),'')}${addZero(getLastDateDay(new Date()))}000000`;
             
             this.chineseDateMonth = `${date.getFullYear()}年${date.getMonth()+1}月`
-
+            this.returnDate = `${date.getFullYear()}/${date.getMonth()+1}/${date.getDate()}`
             this.queryData();
         },
         computed: {
@@ -350,12 +354,28 @@ import { getAqiLevels} from '@/utils/aqi.js'
             }
         },
 		methods:{
+            queryData(){//查询数据
+                let params = {
+                    starttime:this.starttime,
+                    endtime:this.endtime,
+                    type:'day',
+                    citycode:this.citycode
+                }
+                this.$http('/airMoniData/getCityMoniListByLongTime',params,'Get').then(res=>{
+                    if(res.data.result && res.data.result.length>0){
+                        this.calendarData = res.data.result;
+                        this.selectDate();
+                    }
+                })
+            },
             dateChange(e){
                 //返回日期
                 let date = new Date(e.date);
-                
-                console.log(e)
+                this.returnDate = e.date;
+                // console.log(e)
+                this.selectDate();
             },
+
             dateMonthChange(e){
                 this.chineseDateMonth = e.chineseDateMonth;
                 this.starttime = `${getDateYM(dateAdd(new Date(e.date),'d',-0),'')}01000000`;
@@ -367,6 +387,7 @@ import { getAqiLevels} from '@/utils/aqi.js'
                 }else{
                     this.lowerShow = true;
                 }
+                this.returnDate = e.date;
                 this.queryData();
             },
             backToday(){
@@ -378,18 +399,47 @@ import { getAqiLevels} from '@/utils/aqi.js'
             lower(){//下个月
                 this.$refs.calendar.lower();
             },
-            queryData(){//查询数据
-                let params = {
-                    starttime:this.starttime,
-                    endtime:this.endtime,
-                    type:'day',
-                    citycode:this.citycode
-                }
-                this.$http('/airMoniData/getCityMoniListByLongTime',params,'Get').then(res=>{
-                    if(res.data.result && res.data.result.length>0){
-                        this.calendarData = res.data.result
+            selectDate(){
+                let date = new Date(this.returnDate);
+                let obj = {}
+                this.calendarData.map(item=>{
+                    let day = new Date(item.datatime.replace(/-/g, '/')).getDate();
+                    if(day == date.getDate()){
+                        obj = item;
                     }
                 })
+                if( JSON.stringify(obj) == "{}"){
+                    
+                    this.airObj = {
+                        datatime:`${date.getFullYear()}-${addZero(date.getMonth()+1)}-${addZero(date.getDate())}`,
+                        o3:'',
+                        pm10:'',
+                        co:'',
+                        pm25:'',
+                        aqi:'0',
+                        no2:'',
+                        so2:'',
+                        backgroundColor:this.airObj.backgroundColor,
+                        primarypol:'-',
+                        primarypols:'-',
+                    }
+                }else{
+                    this.airObj = {
+                        o3:obj.o3_8h,
+                        pm10:obj.pm10,
+                        co:obj.co,
+                        pm25:obj.pm25,
+                        aqi:obj.aqi,
+                        no2:obj.no2,
+                        so2:obj.so2,
+                        primarypols:this.strObj[obj.primarypol],
+                        primarypol:obj.primarypol,
+                        leave:getAqiLevels(obj.aqi),
+                        backgroundColor:getAqiColor(obj.aqi),
+                        datatime:obj.datatime.split(' ')[0]
+                    }
+                }
+                // console.log(this.returnDate,date.getDate())  2013.22  0.88 2012.34
             },
             airButtomChange(item){
                 if( this.buttonCode !== item.code){
@@ -575,7 +625,7 @@ import { getAqiLevels} from '@/utils/aqi.js'
             .left-box{
                 width: 110px;
                 height: 110px;
-                background: #ffec01;
+                background: #eee;
                 z-index: 1;
                 display: flex;
                 justify-content: center;
@@ -591,7 +641,7 @@ import { getAqiLevels} from '@/utils/aqi.js'
                     .box-content{
                         width: 96px;
                         height: 96px;
-                        background: #ffec01;
+                        background: #eee;
                         z-index: 3;
                         .box-top{
                             height: 18px;
