@@ -84,6 +84,7 @@
                 pagelist:[
                     {name:'空气质量日历',url:'list/airCalendar/airCalendar'},
                     {name:'空气质量日历',url:'list/airCalendar1/airCalendar1'},
+					{name:'竞比城市',url:'list/competitionCity/competitionCity'},
                 ]
             }
         },

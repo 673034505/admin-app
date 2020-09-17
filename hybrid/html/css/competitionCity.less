@@ -1,0 +1,105 @@
+.container{
+    height: 100%;
+    width: 100%;
+    .monthlyCalendar{
+        height: 100%;
+        width: 100%;
+        .month-close{
+            height: 50px;
+            width: 100%;
+            display: flex;
+            position: relative;
+            .month-close-left{
+                height: 100%;
+                width: 100%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            .month-close-right{
+                height: 100%;
+                width: 70px;
+                position: absolute;
+                right: 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background-color: chartreuse;
+            }
+        }
+        .month-title{
+            height: 40px;
+            line-height: 40px;
+            width: 100%;
+            display: flex;
+            padding-top: 10px;
+            .title-left{
+                width: 25%;
+                height: 100%;
+                display: flex;
+                justify-content: flex-end;
+                align-items: center;
+            }
+            .title-center{
+                width: 50%;
+                height: 100%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            .title-right{
+                width: 25%;
+                height: 100%;
+                display: flex;
+                justify-content: flex-start;
+                align-items: center;
+            }
+        }
+        .month-cotent{
+            width: 100%;
+            .month-ul{
+                height: 100%;
+                width: calc(100% - 30px);
+                padding: 0 15px;
+                display: flex;
+                flex-wrap: wrap;
+                .month-li{
+                    width: 25%;
+                    height: 80px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    color: #000;
+                    .dateSelect{
+                        background: #3c72f9;
+                        color: #fff;
+                    }
+                    .month-box{
+                        height: 64px;
+                        width: 52px;
+                        font-size: 12px;
+                        // background-color: aqua;
+                        .month-day{
+                            height: 42px;
+                            width: 100%;
+                            text-align: center;
+                            line-height: 60px;
+                        }
+                        .month-font{
+                            height: 20px;
+                            line-height: 14px;
+                            text-align: center;
+                        }
+                        .month-ash{
+                            color: #c8c9cc;
+                        }
+                    }
+                }
+            }
+        }
+        .month-bottom{
+            height: 30px;
+            width: 100%;
+        }
+    }
+}

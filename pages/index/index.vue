@@ -1,8 +1,9 @@
 
 <template>
-         <view class="container">
+         <!-- <view class="container">
              
-        </view>
+        </view> -->
+        <web-view  src="/hybrid/html/competitionCity.html"   ></web-view>
 </template>
 <script>
 import calendar from "@/components/calendar/index.vue"
@@ -27,8 +28,9 @@ import { getAqiLevels,getAqiColor,getPollLevelColor} from '@/utils/aqi.js'
                 // #endif
             },3000)
             
-
+        
             
+
         },
         methods:{
             
@@ -40,6 +42,6 @@ import { getAqiLevels,getAqiColor,getPollLevelColor} from '@/utils/aqi.js'
 
 .container{
     height: 100vh;
-    
+
 }
 </style>

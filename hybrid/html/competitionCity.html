@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<title>竞比城市</title>
+    <style>
+        body{
+            margin:0;
+			margin: 0;
+			    padding: 0;
+        }
+		::-webkit-scrollbar {
+			/*隐藏滚轮*/
+			display: none;
+		}        
+		.competitionCity{
+			height: 100vh;
+			width: 100vw;
+			overflow: hidden;
+			overflow-y: auto;
+			position: relative;
+		}
+		.model{
+			width: 100vh;height: 100vh;background-color: #FFFFFF;
+        }
+        
+    </style>
+    <link rel="stylesheet" href="./js/vant.css">
+    <link rel="stylesheet" href="./css/competitionCity.css">
+	<script src="./js/date.js"></script>
+	<script src="./js/aqi.js"></script>
+    <script src="./js/vue.js" type="text/javascript" charset="utf-8"></script>
+    <script src="./js/vant.min.js"></script>
+	<script src="./js/echarts.min.js"></script>
+    <script src="./js/axios.min.js"></script>
+    <script src="./js/uni.webview.1.5.2.js"></script>
+    <script src="./js/utils.js"></script>
+</head>
+<body >
+
+
+<div class="competitionCity" id="app">
+	<!-- 优化当页面一开始进入时加载出问题 -->
+	<div class="model"  :style="{height:load?'0':''}">
+    </div>
+        <div class="container">
+            <div class="time-title">
+                <!-- <van-cell title="选择日期区间" :value="date" @click="show = true" /> -->
+                <div  class="" @click="monthShow = true" >选择日期</div>
+                <!-- <van-calendar v-model="show" type="range" :min-date="minDate" :default-date="defaultDate"  color="#3c72f9" @confirm="onConfirm" /> -->
+
+                <van-popup v-model="monthShow" round position="bottom"  >
+                    <div class="monthlyCalendar">
+                        <!-- 关闭按钮 -->
+                        <div class="month-close">
+                            <div class="month-close-left">
+                                日期选择
+                            </div>
+                            <div class="month-close-right" @click="monthClose">
+                                <van-icon name="cross" />
+                            </div>
+                           
+                        </div>
+                        <div class="month-title">
+                            <div class="title-left" @click="upper"> <van-icon name="arrow-left" /> </div>
+                            <div class="title-center">  {{currentYear}}年 </div>
+                            <div class="title-right" @click="lower"> <van-icon name="arrow" /> </div>
+                        </div>
+                        <!-- 内容 -->
+                        <div class="month-cotent">
+                            <div class="month-ul">
+                                <div class="month-li"  v-for="(item, index) in monthLive" :key="'month'+index" @click="monthSelect(item)">
+                                    <div class="month-box"   :class="{dateSelect:((yearDateSelct[0] == currentYear && monthDateSelct[0] == item ) || (yearDateSelct[1] == currentYear && monthDateSelct[1] == item)) }">
+                                        <div class="month-day"> {{item}}月</div>
+                                        <div class="month-font" v-if="( yearDateSelct[0] == currentYear && monthDateSelct[0] == item )"> 开始 </div>
+                                        <div class="month-font" v-if="( yearDateSelct[1] == currentYear && monthDateSelct[1] == item )"> 结束 </div>
+                                    </div>
+                                </div>
+                                <div class="month-li"  v-for="(item, index) in monthNoLive" :key="'ash'+index">
+                                    <div class="month-box">
+                                        <div class="month-day month-ash"> {{12 - monthNoLive + item}}月</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 底部空间 -->
+                        <div class="month-bottom">
+
+                        </div>
+                    </div>
+
+                </van-popup>
+            </div>
+        </div>   		
+</div>
+
+
+
+<script type="module" >
+	var _self;
+	var vm = new Vue({
+        el : "#app",
+		data : {
+			   //下拉刷新
+			   load:true,//窗体加载
+               clientWidth:'',
+               date: '',
+               minDate:new Date('1980'),
+               show: true,
+               defaultDate:[new Date('2020/09/01'),new Date('2020/09/17')],//默认选中
+               monthLive:9,
+               monthNoLive:3,
+               monthShow:true,//月份
+               currentYear: 2020,//当前年份
+            //    monthDateSelct:['2020/09/01','2020/09/09'],//
+                monthDateSelct:[1,9],
+                yearDateSelct:[2020,2020]
+
+		},
+		created() {
+
+            _self = this;
+            this.queryData()
+            //9 == (new Date( this.monthDateSelct[0]).getMonth() + 1)
+            console.log( this.currentYear == (new Date( this.monthDateSelct[0]).getFullYear()) )
+        },  
+		mounted : function(){
+			this.load = true
+			 //解决键盘出来 屏幕缩小的问题
+			 this.clientWidth = document.documentElement.clientWidth;
+        },	
+        computed: {
+            monthStarts(){
+                
+            }
+        },
+        methods: {
+            queryData(){
+                let params = {
+                    starttime:'20200917',
+                    endtime:'20200918',
+                    type:'day',
+                    citycode:'433133'
+                }
+                // getHttp('/airMoniData/getCityMoniListByLongTime',params).then(res=>{
+                //     console.log(res)
+                // })
+            },
+            gotu(){
+                navigateTo('list/airCalendar/airCalendar')
+            },
+            formatDate(date) {
+                return `${date.getMonth() + 1}/${date.getDate()}`;
+            },
+            onConfirm(date) {
+                const [start, end] = date;
+                this.show = false;
+                this.date = `${this.formatDate(start)} - ${this.formatDate(end)}`;
+            },
+            onAAA(){
+                this.show = true;
+                console.log('点击了')
+            },
+            monthClose(){//日期关闭
+                this.monthShow = false;
+            },
+            upper(){//上一年
+                this.currentYear = (this.currentYear - 1);
+                let date = new Date();
+                if(date.getFullYear() == this.currentYear  ){
+                    this.monthLive = Number(date.getMonth()+1);
+                    this.monthNoLive = Number(12 - this.monthLive);
+                }else if(  this.currentYear > date.getFullYear()  ){
+                    this.monthLive = 0;
+                    this.monthNoLive = 12
+                }else if(  this.currentYear < date.getFullYear()  ){
+                    this.monthLive = 12;
+                    this.monthNoLive = 0
+                }
+                
+                // console.log(this.monthLive,  )
+            },
+            lower(){//下一年
+                this.currentYear = (this.currentYear + 1);
+                let date = new Date();
+                if(date.getFullYear() == this.currentYear  ){
+                    this.monthLive = Number(date.getMonth()+1);
+                    this.monthNoLive = Number(12 - this.monthLive);
+                }else if(  this.currentYear > date.getFullYear()  ){
+                    this.monthLive = 0;
+                    this.monthNoLive = 12
+                }else if(  this.currentYear < date.getFullYear()  ){
+                    this.monthLive = 12;
+                    this.monthNoLive = 0
+                }
+            },
+            monthSelect(e){
+                console.log(e,'选中',this.currentYear)
+                
+            }
+        },
+		
+	});
+	
+</script>
+
+</body>
+</html>
