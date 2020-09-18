@@ -117,7 +117,7 @@
             
             <div class="button-box">
                 <div class="airButton air-flex">
-                    <div class="a-button" v-bind:class="[ item.code == buttonCode ? 'b_button' : '']" v-for="(item,index) in airButtonArr" :key="index" @click="airButtomChange(item)">  <div v-html="item.html" class="b-text"></div> </div>
+                    <div class="a-button" v-bind:class="[ item.code == buttonCode ? 'b_button' : '']" v-for="(item,index) in airButtonArr" :key="index" @click="airButtomChange(item,index)">  <div v-html="item.html" class="b-text"></div> </div>
                 </div>
             </div>
             <div class="chart">
@@ -203,10 +203,10 @@
                     {code:'co',name:'CO',html:'CO'},
                 ],
                 buttonCode:'aqi',
+                buttonIndex:0,
                 strObj:{'PM2.5':`PM<sub>2.5</sub>`,'PM25':'PM<sub>2.5</sub>','PM10':'PM<sub>10</sub>','SO2':`SO<sub>2</sub>`,'NO2':'NO<sub>2</sub>','o3':'O<sub><sub>3</sub>','O3-8h':'O<sub><sub>3</sub>','O3':'O<sub><sub>3</sub>','-':'-'},
                 popupShows:false,
                 cityArr:[
-                    
                     {citycode:'130100',cityname:'石家庄市'},
                     {citycode:'130500',cityname:'邢台市'},
                     {citycode:'130400',cityname:'邯郸市'},
@@ -226,23 +226,21 @@
                     {citycode:'130600',cityname:'保定市'},
                     {citycode:'131100',cityname:'衡水市'},
                 ],
+                cityAutoStr:'',
                 citySelectIndex:0,
                 tableList:[
                     {time:'09-17 10:00',city1:'-',city2:'-',city3:'-',city4:'-',city5:'-'},
                     {time:'09-17 09:00',city1:'50',city2:'43',city3:'30',city4:'50',city5:'30'},
                     {time:'09-17 08:00',city1:'40',city2:'47',city3:'32',city4:'44',city5:'34'},
                 ],
+                allData:[],//所有数据
+                chartObj:{},
                 starttime:'',//查询时间
                 endtime:'',//
+                color:['#4cc661','#3578eb','#48ceb3','#f2aa00','#f5516c']
             },
 		created() {
-            
-            // console.log( JSON.parse( JSON.stringify( obj)) instanceof Object)
-            // console.log(obj instanceof Object,'====')
             _self = this;
-            this.queryData()
-            //9 == (new Date( this.monthDateSelct[0]).getMonth() + 1)
-            console.log( this.currentYear == (new Date( this.monthDateSelct[0]).getFullYear()) )
 
             //默认选择72小时
             let starttime = `${getDateYMDH(dateAdd(new Date(),'h',-72),'-')}:00:00`;
@@ -252,6 +250,8 @@
 
             this.starttime = `${getDateYMDH(dateAdd(new Date(starttime.replace(/-/g, '/')),'h',-0),'')}0000`;
             this.endtime = `${getDateYMDH(dateAdd(new Date(endtime.replace(/-/g, '/')),'h',-0),'')}0000`;
+
+            this.queryData()
         },  
 		mounted : function(){
 			this.load = true
@@ -265,39 +265,107 @@
         },
         methods: {
             queryData(){
+                this.cityAutoStr = '';
+                this.citySelectArr.map(item=>{
+                    this.cityAutoStr +=`${item.citycode},`
+                })
+                this.cityAutoStr = this.cityAutoStr.substring(0,this.cityAutoStr.length-1);
                 let params = {
-                    starttime:'20200917',
-                    endtime:'20200918',
-                    type:'day',
-                    citycode:'433133'
+                    starttime:this.starttime,
+                    endtime:this.endtime,
+                    type:this.timeCode,
+                    citycode:this.cityAutoStr
                 }
-                // getHttp('/airMoniData/getCityMoniListByLongTime',params).then(res=>{
-                //     console.log(res)
-                // })
+                getHttp('/chinaMoniData/getMutilCityOnChinaByLongTime',params).then(res=>{
+                    if(res.data.result && res.data.result.length>0){
+                        this.allData = res.data.result;
+                        this.ProcessingData(res.data.result)
+                    }
+                })
+            },
+            ProcessingData(){//数据进行处理
+                let obj = {}
+                let chartObj = {}
+                
+                for (let index = 0; index < this.citySelectArr.length; index++) {
+                    obj[this.citySelectArr[index].citycode] = []
+                    chartObj[this.citySelectArr[index].citycode] = []
+                }
+                for (let index = 0; index < this.allData.length; index++) {
+                        obj[this.allData[index].citycode].push(this.allData[index])
+                    
+                }
+
+                this.tableList = []
+                
+                for (let index = 0; index < obj[this.citySelectArr[0].citycode].length; index++) {
+                    let datatime = obj[this.citySelectArr[0].citycode][index].datatime;
+                    var date = new Date(datatime.replace(/-/g, '/'))
+                    let time = ''
+                    if(this.timeCode == 'day'){
+                        time = `${date.getMonth()+1}月${date.getDate()}日`
+                    }else if(this.timeCode == 'hour'){
+                        time = `${addZero(date.getMonth()+1)}-${addZero(date.getDate())} ${addZero(date.getHours())}:00`
+                    }else if(this.timeCode == 'month'){
+                        time = `${date.getFullYear()}年${date.getMonth()+1}月`
+                    }
+                    
+                    this.tableList.push({
+                            time:time,
+                            city1:obj[this.citySelectArr[0].citycode][index][this.buttonCode],
+                            city2:obj[this.citySelectArr[1].citycode][index][this.buttonCode],
+                            city3:obj[this.citySelectArr[2].citycode][index][this.buttonCode],
+                            city4:obj[this.citySelectArr[3].citycode][index][this.buttonCode],
+                            city5:obj[this.citySelectArr[4].citycode][index][this.buttonCode]
+                        })
+
+                    chartObj[this.citySelectArr[0].citycode].push([datatime,obj[this.citySelectArr[0].citycode][index][this.buttonCode] ])   
+                    chartObj[this.citySelectArr[1].citycode].push([datatime,obj[this.citySelectArr[1].citycode][index][this.buttonCode] ])     
+                    chartObj[this.citySelectArr[2].citycode].push([datatime,obj[this.citySelectArr[2].citycode][index][this.buttonCode] ])   
+                    chartObj[this.citySelectArr[3].citycode].push([datatime,obj[this.citySelectArr[3].citycode][index][this.buttonCode] ])   
+                    chartObj[this.citySelectArr[4].citycode].push([datatime,obj[this.citySelectArr[4].citycode][index][this.buttonCode] ])   
+                }
+                this.chartObj = chartObj;
+                this.setBarEchart()
+            },
+            returnCityName(citycode){
+                let name = ''
+                this.cityArr.map(item=>{
+                    if( item.citycode == citycode){
+                        name = item.cityname;
+                    }
+                })
+                return name;
             },
             setBarEchart(){//设置折线图
-                //因为有可能日期不是全的
-                // var t = 0;
-                // let arr = [];
-                // var endtime = new Date( `${this.returnDate} 23:00:00` );
-                // let startInitialDate = this.returnDate;
-                // while(dateAdd(new Date(startInitialDate+" 00:00:00"),'h',t)<=endtime)//遍历日期时间
-                // {
-                // var times =getDateYMDHMS(dateAdd(new Date(startInitialDate+" 00:00:00"),'h',t));//获得日期
-                // var foreValue 
-                //     for(let i=0;i<this.dayDataArr.length;i++)//遍历模型下面的数组
-                //     {
-                //         if(times==this.dayDataArr[i]["datatime"])//根据时间查找当天的预报值
-                //         {
-                //             foreValue=this.dayDataArr[i][this.buttonCode];
-                //         break;
-                //         }else{
-                //             foreValue = null;
-                //         }
-                //     }
-                //     arr.push([times,foreValue])
-                //     t=t+1;
-                // }
+                let seriesDate = [];
+                let legendArr = []
+                
+                if(JSON.stringify(this.chartObj) != '{}' ){
+                    let colorIndex = 0;
+                    for(let key in this.chartObj){
+                        // this.returnCityName(key)
+                        seriesDate.push({
+                            name: this.returnCityName(key),
+                            type: 'line',
+                            symbol: 'none',
+                            data:this.chartObj[key],
+                            color:this.color[colorIndex],
+                            itemStyle: {
+                                normal: {
+                                    lineStyle: {
+                                        width:1// 0.1的线条是非常细的了
+                                    }
+                                }
+                            },
+                        })
+                        legendArr.push( this.returnCityName(key))
+                        colorIndex+=1;
+                    }
+                }
+
+
+
                 let Labelformatter =  null;
                 if(this.timeCode == 'month'){
                     Labelformatter = function(params,index){
@@ -324,11 +392,15 @@
                         trigger: 'axis',
                         confine:true,
                     },
+                    legend: {
+                        y: 'bottom',
+                        data:legendArr,
+                    },
                     grid: {  
                         left: '10%',  
                         right: '8%', 
                         top: '10%',  
-                        bottom: '10%',
+                        bottom: '30%',
                     },
 					xAxis: {
                         type : 'time',
@@ -350,50 +422,46 @@
                             }
                         }
                     },
-					series: [{
-						name: this.echatName,
-                        type: 'bar',
-                        itemStyle: {
-                            normal: {
-                                color: function(params) {
-                                    return getPollLevelColor(_self.buttonCode,params.data[1],'hour')
-                                },
-                            }
-                        },
-						data: arr
-					}]
+                    series: seriesDate
+                    // series: []
                 }
                 var myChart = echarts.init(document.getElementById('echarts1'));
                  // 使用刚指定的配置项和数据显示图表。
                  myChart.setOption(option);
             },
-            airButtomChange(item){//切换污染物
+            airButtomChange(item,index){//切换污染物
                 if( this.buttonCode !== item.code){
                     this.buttonCode = item.code;
                     this.echatName = item.name;
+                    this.buttonIndex = index;
+                    this.ProcessingData()
                 }
             },
             cityClick(item,index){//点击城市
-                console.log(item,index);
                 this.popupShows = true;
                 this.citySelectIndex = index;
             },
             cityConfirmChange(e){//城市确定
+                let fig = false;
                 this.citySelectArr.map(item=>{
                     if(item.citycode == e.citycode){
-                        this.popupShows = false;
-                        this.$toast({
-                            message: '不允许选择已有城市,请重新选择',
-                            position: 'bottom',
-                            duration:'1000'
-                        })
-                        return
+                        fig = true;
                     }
                 })
-                console.log(e,this.citySelectIndex)
-                this.citySelectArr[this.citySelectIndex].citycode = e.citycode;
-                this.citySelectArr[this.citySelectIndex].cityname = e.cityname;
-                this.popupShows = false;
+                if( fig){
+                    this.popupShows = false;
+                    this.$toast({
+                        message: '不允许选择已有城市,请重新选择',
+                        position: 'bottom',
+                        duration:'1000'
+                    })
+                }else{
+                    this.citySelectArr[this.citySelectIndex].citycode = e.citycode;
+                    this.citySelectArr[this.citySelectIndex].cityname = e.cityname;
+                    this.popupShows = false;
+                    this.queryData()
+                }
+                
             },
             cityCancelChange(){//城市取消
                 this.popupShows = false;
@@ -403,8 +471,6 @@
                     return
                 }
                 this.timeCode = e.code;
-                
-
                 //设置默认查询的时间
                 if(this.timeCode == 'month'){//点击日期
                     let date = new Date();
@@ -418,6 +484,18 @@
                     
                     this.starttime = `${getDateYM(dateAdd(new Date(starttime.replace(/-/g, '/')),'h',-0),'')}00000000`;
                     this.endtime = `${getDateYM(dateAdd(new Date(endtime.replace(/-/g, '/')),'h',-0),'')}00000000`;
+
+                    this.airButtonArr=[
+                        {code:'countindex',name:'综合指数',html:'综合指数'},
+                        {code:'pm25',name:'PM2.5',html:'PM<sub>2.5</sub>'},
+                        {code:'pm10',name:'PM10',html:'PM<sub>10</sub>'},
+                        {code:'o3_8h',name:'o3_8h',html:'O<sub>3</sub>_8h'},
+                        {code:'so2',name:'SO2',html:'SO<sub>2</sub>'},
+                        {code:'no2',name:'NO2',html:'NO<sub>2</sub>'},
+                        {code:'co',name:'CO',html:'CO'},
+                    ]
+                   this.buttonCode = 'aqi';
+
                 }else{
                     //说明点击的72小时和30日    
                     if(this.timeCode == 'day'){
@@ -432,6 +510,16 @@
                         this.starttime = `${getDateYMD(dateAdd(new Date(starttime.replace(/-/g, '/')),'h',-0),'')}000000`;
                         this.endtime = `${getDateYMD(dateAdd(new Date(endtime.replace(/-/g, '/')),'h',-0),'')}000000`;
 
+                        this.airButtonArr=[
+                            {code:'aqi',name:'AQI',html:'AQI'},
+                            {code:'pm25',name:'PM2.5',html:'PM<sub>2.5</sub>'},
+                            {code:'pm10',name:'PM10',html:'PM<sub>10</sub>'},
+                            {code:'o3_8h',name:'o3_8h',html:'O<sub>3</sub>_8h'},
+                            {code:'so2',name:'SO2',html:'SO<sub>2</sub>'},
+                            {code:'no2',name:'NO2',html:'NO<sub>2</sub>'},
+                            {code:'co',name:'CO',html:'CO'},
+                        ]
+
                     }else{
                         let starttime = `${getDateYMDH(dateAdd(new Date(),'h',-72),'-')}:00:00`;
                         let endtime = `${getDateYMDH(dateAdd(new Date(),'h',0),'-')}:00:00`;
@@ -440,12 +528,25 @@
                          //查询时间设置
                         this.starttime = `${getDateYMDH(dateAdd(new Date(starttime.replace(/-/g, '/')),'h',-0),'')}0000`;
                         this.endtime = `${getDateYMDH(dateAdd(new Date(endtime.replace(/-/g, '/')),'h',-0),'')}0000`;
+                        this.airButtonArr=[
+                            {code:'aqi',name:'AQI',html:'AQI'},
+                            {code:'pm25',name:'PM2.5',html:'PM<sub>2.5</sub>'},
+                            {code:'pm10',name:'PM10',html:'PM<sub>10</sub>'},
+                            {code:'o3',name:'O3',html:'O<sub>3</sub>'},
+                            {code:'so2',name:'SO2',html:'SO<sub>2</sub>'},
+                            {code:'no2',name:'NO2',html:'NO<sub>2</sub>'},
+                            {code:'co',name:'CO',html:'CO'},
+                        ]
                     }
+
+                    
+                    // o3_8h
+                   
                 }
-                console.log(this.starttime,this.endtime)
+                this.buttonCode = this.airButtonArr[this.buttonIndex].code;
+                this.queryData()
             },
             timeClick(){//点击时间
-                console.log(this.timeCode)
                 if(this.timeCode == 'month'){//点击日期
                     this.monthShow = true;
 
@@ -453,9 +554,6 @@
                     //说明点击的72小时和30日
                     this.show = true;
                 }
-            },
-            formatDate(date) {
-                return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`;
             },
             onConfirm(date) {//确地选择的时间
                 const [start, end] = date;
@@ -491,7 +589,7 @@
                         this.endtime = `${getDateYMD(dateAdd(new Date(endtime.replace(/-/g, '/')),'h',-0),'')}230000`;
                     }
                 }
-                console.log(this.starttime,this.endtime)
+                this.queryData()
             },
             //自定义日历开始
             monthClose(){//日期关闭
@@ -583,8 +681,7 @@
                 this.starttime = `${getDateYM(dateAdd(new Date(starttime.replace(/-/g, '/')),'h',-0),'')}00000000`;
                 this.endtime = `${getDateYM(dateAdd(new Date(endtime.replace(/-/g, '/')),'h',-0),'')}00000000`;
 
-
-                console.log(this.starttime,this.endtime)
+                this.queryData()
             },
             //自定义日历结束
 

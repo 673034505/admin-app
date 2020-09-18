@@ -145,7 +145,8 @@
   align-items: center;
 }
 .container .date-switch .switch-box .switch-button {
-  height: 30px;
+  font-size: 12px;
+  height: 25px;
   padding: 0 15px;
   background-color: #fff;
   display: flex;
@@ -178,17 +179,16 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 12px;
+  font-size: 10px;
 }
 .container .airButton .a-button {
-  height: 30px;
+  height: 20px;
   width: 11.8%;
   border-radius: 5px;
   background: #FFF;
-  display: flex;
-  justify-content: center;
+  text-align: center;
+  line-height: 21px;
   color: #686868;
-  align-items: center;
   margin: 0 auto;
   border: 1px solid #dddddd;
 }
@@ -199,7 +199,7 @@
 .container .chart {
   width: calc(100% - 10px);
   padding: 0 5px;
-  height: 200px;
+  height: 250px;
 }
 .container .chart .echarts {
   height: 100%;
