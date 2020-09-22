@@ -1,0 +1,111 @@
+.container {
+  height: 100%;
+  width: 100%;
+}
+.container .time-nav {
+  height: 40px;
+  display: flex;
+  width: 100%;
+  border-bottom: 1px solid #cecfd1;
+}
+.container .time-nav .nav-left {
+  height: 100%;
+  font-size: 12px;
+  width: 22%;
+  color: #656565;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.container .time-nav .nav-left .picker {
+  height: 38px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.container .time-nav .nav-center {
+  height: 100%;
+  width: 53%;
+  font-size: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.container .time-nav .nav-center .center-time {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #2e64fa;
+}
+.container .time-nav .nav-right {
+  height: 100%;
+  width: 25%;
+  display: flex;
+  font-size: 12px;
+  justify-content: center;
+  align-items: center;
+  margin-right: 3px;
+  color: #656565;
+}
+.container .time-nav .nav-right .nav-button {
+  font-size: 12px;
+  width: 45%;
+  height: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #fff;
+  border: 1px solid #bbbbbb;
+}
+.container .time-nav .nav-right .nav-button:nth-child(1) {
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+  border-right: 0;
+}
+.container .time-nav .nav-right .nav-button:nth-child(2) {
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+.container .time-nav .nav-right .b_button {
+  color: #FFF;
+  background: #1f8cf1;
+}
+.container .chart-box {
+  height: 350px;
+  width: 100%;
+}
+.container .chart-box .title {
+  width: 100%;
+  height: 50px;
+  display: flex;
+  align-items: center;
+}
+.container .chart-box .title .radioBox {
+  width: 15px;
+  height: 15px;
+  margin-left: 15px;
+  background-color: #bdd4fd;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.container .chart-box .title .radioBox .radioMinBox {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background-color: #208eed;
+}
+.container .chart-box .title .title-font {
+  margin-left: 8px;
+}
+.container .chart-box .echart-box {
+  height: calc(100% - 50px);
+}
+.container .chart-box .echart-box .echart {
+  height: 100%;
+  width: 100%;
+}

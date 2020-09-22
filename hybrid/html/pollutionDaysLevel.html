@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<title>污染天数级别分析</title>
+    <style>
+        body{
+            margin:0;
+			margin: 0;
+			    padding: 0;
+        }
+		::-webkit-scrollbar {
+			/*隐藏滚轮*/
+			display: none;
+        }     
+        div{
+            -webkit-user-select:none;
+            -moz-user-select:none;
+            -ms-user-select:none;
+            user-select:none;
+        }   
+		.competitionCity{
+			height: 100vh;
+			width: 100vw;
+			overflow: hidden;
+			overflow-y: auto;
+			position: relative;
+		}
+		.model{
+			width: 100vh;height: 100vh;background-color: #FFFFFF;
+        }
+        
+    </style>
+    <link rel="stylesheet" href="./js/vant.css">
+    <link rel="stylesheet" href="./css/pollutionDaysLevel.css">
+	<script src="./js/date.js"></script>
+	<script src="./js/aqi.js"></script>
+    <script src="./js/vue.js" type="text/javascript" charset="utf-8"></script>
+    <script src="./js/vant.min.js"></script>
+	<script src="./js/echarts.min.js"></script>
+    <script src="./js/axios.min.js"></script>
+    <script src="./js/uni.webview.1.5.2.js"></script>
+    <script src="./js/utils.js"></script>
+</head>
+<body >
+
+
+<div class="competitionCity" id="app">
+	<!-- 优化当页面一开始进入时加载出问题 -->
+	<div class="model"  :style="{height:load?'0':''}">
+    </div>
+        <div class="container">
+            
+            <div class="time-nav">
+                <div class="nav-left" >
+                    <div  class="picker" @click="clickPopupShows">
+                        {{cityname}}<van-icon name="arrow-down" color="#d0d0d0" style="margin-left: 2px;" />
+                    </div>
+                    <van-popup v-model="popupShows" round position="bottom"  >
+                        <van-picker show-toolbar  :columns="cityArr"  
+                        @confirm="cityConfirmChange"
+                        @cancel="cityCancelChange" value-key="cityname" /> 
+                </div>
+                
+                <div class="nav-center">
+                    <div class="center-time" @click="timeClick">
+                        {{defaultDateStr}}
+                    </div>
+                     <!-- 日历开始 -->
+                     <van-calendar v-model="show" type="range" :min-date="minDate" :max-date="maxDate" :default-date="defaultDate"  color="#3c72f9" @confirm="onConfirm" />
+                     <!-- 日历结束 -->
+
+                </div>
+                <div class="nav-right">
+                    <div class="nav-button" v-for="(item, index) in timeTypeArr" v-bind:class="[ item.code == timeType ? 'b_button' : '']"  @click="timeChanges(item)" :key="index">
+                        {{item.name}}
+                    </div>
+                </div>
+            </div>
+            
+            <div style="background: #f6f7f9;height: 10px;"></div>
+            
+            <div class="chart-box airAqiLevel">
+                <div class="title">
+                    <div class="radioBox"> <div class="radioMinBox"></div> </div>
+                    <div class="title-font">空气质量等级占比</div>
+                </div>
+                <div class="echart-box">
+                    <div class="echart" id="echart1"></div>
+                </div>
+            </div>
+            
+            <div style="background: #f6f7f9;height: 10px;"></div>
+            <div class="chart-box airAqiLevel">
+                <div class="title">
+                    <div class="radioBox"> <div class="radioMinBox"></div> </div>
+                    <div class="title-font">污染天中首要污染物的占比</div>
+                </div>
+                <div class="echart-box">
+                    <div class="echart" id="echart2"></div>
+                </div>
+            </div>
+
+            <div style="background: #f6f7f9;height: 10px;"></div>
+            <div class="chart-box airAqiLevel">
+                <div class="title">
+                    <div class="radioBox"> <div class="radioMinBox"></div> </div>
+                    <div class="title-font">六项污染物贡献率分布</div>
+                </div>
+                <div class="echart-box">
+                    <div class="echart" id="echart3"></div>
+                </div>
+            </div>
+
+        </div>   		
+</div>
+
+
+
+<script type="module" >
+	var _self;
+	var vm = new Vue({
+        el : "#app",
+		data : {
+			   //下拉刷新
+			   load:true,//窗体加载
+               clientWidth:'',
+               minDate:new Date('1980'),
+               maxDate:new Date(),
+               show: false,
+               defaultDate:[new Date('2020/01/01'),new Date('2020/09/22')],//默认选中
+               defaultDateStr:'',
+               //自定义日历开始
+               monthLive:9,
+               monthNoLive:3,
+               monthShow:false,//月份
+               currentYear: 2020,//当前年份
+               monthDateSelct:[1,9],
+               yearDateSelct:[2019,2020],
+               monthobj:{},
+               //自定义日历结束
+               timeArr:[
+                  {code:'hour',name:"72小时"},
+                  {code:'day',name:"30日"},
+                  {code:'month',name:"12月"},
+               ],
+               timeCode:'hour',
+               airButtonArr:[
+                    {code:'aqi',name:'AQI',html:'AQI'},
+                    {code:'pm25',name:'PM2.5',html:'PM<sub>2.5</sub>'},
+                    {code:'pm10',name:'PM10',html:'PM<sub>10</sub>'},
+                    {code:'o3',name:'O3',html:'O<sub>3</sub>'},
+                    {code:'so2',name:'SO2',html:'SO<sub>2</sub>'},
+                    {code:'no2',name:'NO2',html:'NO<sub>2</sub>'},
+                    {code:'co',name:'CO',html:'CO'},
+                ],
+                buttonCode:'aqi',
+                buttonIndex:0,
+                strObj:{'PM2.5':`PM<sub>2.5</sub>`,'PM25':'PM<sub>2.5</sub>','PM10':'PM<sub>10</sub>','SO2':`SO<sub>2</sub>`,'NO2':'NO<sub>2</sub>','o3':'O<sub><sub>3</sub>','O3-8h':'O<sub><sub>3</sub>','O3':'O<sub><sub>3</sub>','-':'-'},
+                popupShows:false,
+                cityArr:[
+                    {citycode:'130100',cityname:'石家庄市'},
+                    {citycode:'130500',cityname:'邢台市'},
+                    {citycode:'130400',cityname:'邯郸市'},
+                    {citycode:'130600',cityname:'保定市'},
+                    {citycode:'131100',cityname:'衡水市'},
+                    {citycode:'130200',cityname:'唐山市'},
+                    {citycode:'131000',cityname:'廊坊市'},
+                    {citycode:'130900',cityname:'沧州市'},
+                    {citycode:'130300',cityname:'秦皇岛市'},
+                    {citycode:'130800',cityname:'承德市'},
+                    {citycode:'131200',cityname:'张家口市'},
+                ],
+                citycode:'130500',
+                cityname:'邢台市',
+                timeTypeArr:[
+                    {code:'month',name:"本月"},
+                    {code:'year',name:"本年"},
+                ],
+                timeType:'month',
+                allData:[],
+                airPrimarypolObj:{'PM2.5':0,'PM10':0,'O3-8h':0,'NO2':0,'SO2':0,'CO':0,'-':0},//首要污染物统计
+                airPrimarypolName:{'PM2.5':'PM2.5','PM10':'PM10','CO':'CO','NO2':'NO2','SO2':'SO2','O3-8h':'O3','-':'无'},//首要污染物统计
+                airPrimarypolColor:{'PM2.5':'#ff9933','PM10':'#cc3333','O3':'#00bfff','O3-8h':'#00bfff','SO2':'#814398','NO2':'#009966','CO':'#0070c0','无':'#eee'},//污染物相对颜色配置
+                air_color:{'pm25':'#ffcd3e','pm10':'#5cdfd7','o3_8h':'#4e9ff0','so2':'#d0f23b','no2':'#56dd37','co':'#ff7840'},//污染物相对颜色配置
+                airAqiLevelColor:{ '优':'#00e400','良':'#ffff00','轻度':'#ff7e00','中度':'#ff0000','重度':'#99004c','严重':'#7e0023'},
+                airCalculation:{'pm25':35,'pm10':70,'co':4,'no2':40,'so2':60,'o3_8h':163},//综合指数贡献比指数计算
+                airIndexName:{'pm25':'PM2.5','pm10':'PM10','co':'CO','no2':'NO2','so2':'SO2','o3_8h':'o3_8h'},//综合指数贡献比Name
+                airIndexColor:{'pm25':'#389ffe','pm10':'#fec045','co':'#ff8cc3','no2':'#ac93f9','so2':'#32c6c8','o3_8h':'#f05e75'},//综合指数贡献比颜色
+            },
+		created() {
+            _self = this;
+            let date = new Date();
+            let starttime = `${date.getFullYear()}/${addZero(date.getMonth()+1)}/01`;
+            let endtime = `${date.getFullYear()}/${date.getMonth()+1}/${date.getDate()}`;
+            this.defaultDate = [new Date(starttime),new Date(endtime) ]
+            this.defaultDateStr = `${date.getFullYear()}-${addZero(date.getMonth()+1)}-01 - ${date.getFullYear()}-${addZero(date.getMonth()+1)}-${addZero(date.getDate())}`
+            
+            this.starttime = `${getDateYMD(dateAdd(new Date(starttime.replace(/-/g, '/')),'h',-0),'')}000000`;
+            this.endtime = `${getDateYMD(dateAdd(new Date(endtime.replace(/-/g, '/')),'h',-0),'')}000000`;
+
+            this.queryData()
+        },  
+		mounted : function(){
+			this.load = true
+			 //解决键盘出来 屏幕缩小的问题
+			 this.clientWidth = document.documentElement.clientWidth;
+        },
+        methods: {
+            queryData(){
+                let params = {
+                    starttime:this.starttime,
+                    endtime:this.endtime,
+                    type:'day',
+                    citycode:this.citycode,
+                }
+                getHttp('/chinaMoniData/getCityAirMoniListOnChinaByLongTime',params).then(res=>{
+                    if(res.data.result && res.data.result.length>0){
+                        this.allData = res.data.result;
+                        this.ProcessingData()
+                    }else{
+                        this.allData = [];
+                        this.ProcessingData()
+                    }
+                })
+            },
+            ProcessingData(){
+                let airAqiLevel = {'优':0,'良':0,'轻度':0,'中度':0,'重度':0,'严重':0};//
+                let airPrimarypol = {'PM2.5':0,'PM10':0,'O3-8h':0,'NO2':0,'SO2':0,'CO':0,'-':0}//首要污染物统计  {'PM2.5':0,'PM10':0,'O3-8h':0,'NO2':0,'SO2':0,'CO':0,'-':0}
+                let airIndexObj={'pm25':0,'pm10':0,'co':0,'no2':0,'so2':0,'o3_8h':0,}//综合指数贡献比数据
+                
+                this.allData.map(item=>{
+                    let aqiLevel = getAqiLevels(item.aqi);
+                    airAqiLevel[aqiLevel] = (airAqiLevel[aqiLevel] + 1);
+                    airPrimarypol[item['primarypol']] = (airPrimarypol[item['primarypol']] + 1);
+
+                    for(name in airIndexObj){
+                        airIndexObj[name] = ( airIndexObj[name] + item[name])
+                    }
+                })
+                
+                this.setAirAqilevelPie(airAqiLevel);
+                this.setAirPrimarypolPie(airPrimarypol);
+                this.setAirSexConcentration( airIndexObj)
+            },
+            setAirAqilevelPie(airAqiLevel){//设置空气质量饼图
+                let legendData = []
+                let seriesData = []
+                for(let key in airAqiLevel ){
+                    if( airAqiLevel[key]>0 ){
+                        legendData.push(key)
+                        seriesData.push({
+                            name: key,
+                            value: airAqiLevel[key],
+                            itemStyle:{color:this.airAqiLevelColor[key]}
+                        });
+                    }
+                }
+                let option = {
+                    tooltip: {
+                        trigger: 'item',
+                        formatter: '{b}<br/> 天数 : {c}天 ({d}%)'
+                    },
+                    legend: {
+                        type: 'scroll',
+                        left: 'center',
+                        bottom: 10,
+                        data:legendData,
+                    },
+                    series: [
+                        {
+                            name: '姓名',
+                            type: 'pie',
+                            radius: '55%',
+                            center: ['50%', '50%'],
+                            data: seriesData,
+                            emphasis: {
+                                itemStyle: {
+                                    shadowBlur: 10,
+                                    shadowOffsetX: 0,
+                                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                }
+                            }
+                        }
+                    ]
+                };
+                var myChart = echarts.init(document.getElementById('echart1'));
+                 // 使用刚指定的配置项和数据显示图表。
+                 myChart.setOption(option);
+            },
+            setAirPrimarypolPie(airPrimarypol){//设置首要污染物
+                let legendData = []
+                let seriesData = []
+                for(let key in airPrimarypol ){
+                    if( airPrimarypol[key]>0  && key != '-'){
+                        legendData.push(this.airPrimarypolName[key])
+                        seriesData.push({
+                            name:this.airPrimarypolName[key] ,
+                            value: airPrimarypol[key],
+                            itemStyle:{color:this.airPrimarypolColor[key]}
+                        });
+                    }
+                    
+                }
+                let option = {
+                    tooltip: {
+                        trigger: 'item',
+                        formatter: '{b}<br/> 天数 : {c}天 ({d}%)'
+                    },
+                    legend: {
+                        left: 'center',
+                        bottom: 10,
+                        data:legendData,
+                    },
+                    series: [
+                        {
+                            name: '姓名',
+                            type: 'pie',
+                            radius: '55%',
+                            center: ['50%', '50%'],
+                            data: seriesData,
+                            emphasis: {
+                                itemStyle: {
+                                    shadowBlur: 10,
+                                    shadowOffsetX: 0,
+                                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                }
+                            }
+                        }
+                    ]
+                };
+                var myChart = echarts.init(document.getElementById('echart2'));
+                 // 使用刚指定的配置项和数据显示图表。
+                 myChart.setOption(option);
+            },
+            setAirSexConcentration(airIndexObj){//设置六项污染浓度
+                let legendData = []
+                let seriesData = []
+                for(name in airIndexObj){
+                        if( airIndexObj[name]>0){
+                            let avg =  (airIndexObj[name]/this.allData.length)
+                            //保留3位小数
+                            let value =  ( Math.floor((avg/this.airCalculation[name]) * 1000) / 1000)
+                            airIndexObj[name] =value
+                                seriesData.push({
+                                    value:value,
+                                    name:this.airIndexName[name],
+                                    itemStyle:{color:this.airIndexColor[name]}
+                                    
+                                })
+                            legendData.push(this.airIndexName[name])
+                        }
+                    }
+                let option = {
+                    tooltip: {
+                        trigger: 'item',
+                        formatter: '{b}<br/> 分指数 : {c}({d}%)'
+                    },
+                    legend: {
+                        left: 'center',
+                        bottom: 10,
+                        data:legendData,
+                    },
+                    series: [
+                        {
+                            name: '姓名',
+                            type: 'pie',
+                            radius: '55%',
+                            center: ['50%', '50%'],
+                            data: seriesData,
+                            emphasis: {
+                                itemStyle: {
+                                    shadowBlur: 10,
+                                    shadowOffsetX: 0,
+                                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                }
+                            }
+                        }
+                    ]
+                };
+                var myChart = echarts.init(document.getElementById('echart3'));
+                 // 使用刚指定的配置项和数据显示图表。
+                 myChart.setOption(option);
+            },
+            timeClick(){
+                this.show = true;
+            },
+            onConfirm(date){
+                const [start, end] = date;
+                this.show = false;
+
+                let starttime = `${getDateYMD(dateAdd(new Date(start),'d',-0),'-')}`;
+                let endtime = `${getDateYMD(dateAdd(new Date(end),'d',0),'-')}`;
+                this.defaultDateStr = `${getDateYMD(dateAdd(new Date(starttime.replace(/-/g, '/')),'d',-0),'-')}  -  ${getDateYMD(dateAdd(new Date(endtime.replace(/-/g, '/')),'d',-0),'-')}`
+
+                this.starttime = `${getDateYMD(dateAdd(new Date(starttime.replace(/-/g, '/')),'h',-0),'')}000000`;
+                this.endtime = `${getDateYMD(dateAdd(new Date(endtime.replace(/-/g, '/')),'h',-0),'')}000000`;
+
+                this.queryData();
+            },
+            cityConfirmChange(e){//确定
+                if(e.citycode == this.citycode){
+                    this.popupShows = false;
+                    return 
+                }
+                this.citycode = e.citycode;
+                this.cityname = e.cityname;
+
+                this.popupShows = false;
+                this.queryData();//切换城市查询数据
+            }, 
+            cityCancelChange(){//取消
+                this.popupShows = false;
+            },
+            clickPopupShows(){
+                this.popupShows = true;
+            },
+            timeChanges(e){
+                
+                if(e.code == this.timeType){
+                    return
+                }
+                this.timeType = e.code;
+                if( this.timeType == 'year'){//当他为年时
+                    // defaultDate:[new Date('2020/01/01'),new Date('2020/09/22')],//默认选中
+                    let date = new Date();
+                    let starttime = `${date.getFullYear()}/01/01`;
+                    let endtime = `${date.getFullYear()}/${date.getMonth()+1}/${date.getDate()}`;
+
+                    this.defaultDate = [new Date(starttime),new Date(endtime) ]
+                    this.starttime = `${getDateYMD(dateAdd(new Date(starttime.replace(/-/g, '/')),'h',-0),'')}000000`;
+                    this.endtime = `${getDateYMD(dateAdd(new Date(endtime.replace(/-/g, '/')),'h',-0),'')}000000`;
+
+                    this.defaultDateStr = `${date.getFullYear()}-01-01 - ${date.getFullYear()}-${addZero(date.getMonth()+1)}-${addZero(date.getDate())}`
+                }else{
+                    let date = new Date();
+                    let starttime = `${date.getFullYear()}/${addZero(date.getMonth()+1)}/01`;
+                    let endtime = `${date.getFullYear()}/${date.getMonth()+1}/${date.getDate()}`;
+                    this.defaultDate = [new Date(starttime),new Date(endtime) ]
+                    
+                    this.starttime = `${getDateYMD(dateAdd(new Date(starttime.replace(/-/g, '/')),'h',-0),'')}000000`;
+                    this.endtime = `${getDateYMD(dateAdd(new Date(endtime.replace(/-/g, '/')),'h',-0),'')}000000`;
+                    this.defaultDateStr = `${date.getFullYear()}-${addZero(date.getMonth()+1)}-01 - ${date.getFullYear()}-${addZero(date.getMonth()+1)}-${addZero(date.getDate())}`
+                }
+                this.queryData()
+            }
+        },
+		
+	});
+	
+</script>
+
+</body>
+</html>

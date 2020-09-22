@@ -51,6 +51,7 @@
 	<div class="model"  :style="{height:load?'0':''}">
     </div>
         <div class="container">
+            <!-- 日历开始 -->
             <van-popup v-model="monthShow" round position="bottom"  >
                 <div class="monthlyCalendar">
                     <!-- 关闭按钮 -->
@@ -94,20 +95,19 @@
                 </div>
 
             </van-popup>
-
+            <!-- 日历结束 -->
             <div class="time-title">
                     <div class="time-button" @click="timeClick">
                         {{defaultDateStr}}
                     </div>
                     <!-- 日历开始 -->
                     <van-calendar v-model="show" type="range" :min-date="minDate" :max-date="maxDate" :default-date="defaultDate"  color="#3c72f9" @confirm="onConfirm" />
-                   
                     <!-- 日历结束 -->
             </div>
 
             <div class="date-switch">
                 <div class="switch-box">
-                    <div class="switch-button"v-bind:class="[ item.code == timeCode ? 'b_button' : '']"  v-for="(item, index) in timeArr"   @click="timeButtomChange(item)" :key="index">
+                    <div class="switch-button" v-bind:class="[ item.code == timeCode ? 'b_button' : '']"  v-for="(item, index) in timeArr"   @click="timeButtomChange(item)" :key="index">
                         {{item.name}}
                     </div>
                 </div>
@@ -217,7 +217,7 @@
                     {citycode:'130900',cityname:'沧州市'},
                     {citycode:'130300',cityname:'秦皇岛市'},
                     {citycode:'130800',cityname:'承德市'},
-                    {citycode:'131200',cityname:'张家口时'},
+                    {citycode:'131200',cityname:'张家口市'},
                 ],
                 citySelectArr:[//选中的城市
                     {citycode:'130100',cityname:'石家庄市'},
@@ -250,18 +250,13 @@
 
             this.starttime = `${getDateYMDH(dateAdd(new Date(starttime.replace(/-/g, '/')),'h',-0),'')}0000`;
             this.endtime = `${getDateYMDH(dateAdd(new Date(endtime.replace(/-/g, '/')),'h',-0),'')}0000`;
-
+            
             this.queryData()
         },  
 		mounted : function(){
 			this.load = true
 			 //解决键盘出来 屏幕缩小的问题
 			 this.clientWidth = document.documentElement.clientWidth;
-        },	
-        computed: {
-            monthStarts(){
-                
-            }
         },
         methods: {
             queryData(){
@@ -280,6 +275,10 @@
                     if(res.data.result && res.data.result.length>0){
                         this.allData = res.data.result;
                         this.ProcessingData(res.data.result)
+                    }else{
+                        this.tableList = [];
+                        this.chartObj = {}
+                        this.setBarEchart()
                     }
                 })
             },
@@ -380,7 +379,7 @@
                         if(date.getHours() == 0 || date.getMinutes() > 0 || date.getSeconds() > 0){
                             str  = index === 0 ? '':`${date.getMonth() +1}月${date.getDate()}日`
                         }else{
-                            str  = index === 0 ? '':`${date.getHours()}时`
+                            str  = index === 0 ? '':`${date.getHours()}:00`
                         }
                         return str
                     }
@@ -391,6 +390,26 @@
                     tooltip: {
                         trigger: 'axis',
                         confine:true,
+                        formatter:function(params) {
+                            let time = '';
+                            let timeStr ='';
+                            let valueStr = ''
+                            time = new Date(params[0].value[0]);
+                            if(_self.timeCode == 'month' ){
+                                timeStr = `${addZero(time.getMonth()+1)} ${time.getFullYear()}`;
+                            }else if(_self.timeCode == 'day' ){
+                                timeStr = `${addZero(time.getMonth()+1)}-${addZero(time.getDate())}  ${time.getFullYear()}`;
+                            }else if(_self.timeCode == 'hour' ){
+                                timeStr = `${addZero(time.getMonth()+1)}-${addZero(time.getDate())} ${addZero(time.getHours())}  ${time.getFullYear()}`;
+                            }
+                            params.map(item=>{
+                                if(item.value)
+                                {
+                                valueStr += `${item.marker} ${item.seriesName}:${item.value[1]}<br/>`
+                                }
+                            })
+                            return `${timeStr}<br/>${valueStr}`
+                        }
                     },
                     legend: {
                         y: 'bottom',
@@ -408,7 +427,6 @@
                         splitLine:{show:false},
                         axisLabel: {
                                 interval: 'auto',
-                                // showMaxLabel:false,
                                 formatter: Labelformatter
                         },
                     },

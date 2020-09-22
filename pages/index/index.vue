@@ -3,7 +3,7 @@
          <!-- <view class="container">
              <monthlyCalendar :show="true" @monthDateChanges="monthDateChange" />
         </view> -->
-        <web-view  src="/hybrid/html/competitionCity.html"  @message="handleMessage" ></web-view>
+        <web-view  src="/hybrid/html/pollutionDaysLevel.html"  @message="handleMessage" ></web-view>
 </template>
 <script>
 import calendar from "@/components/calendar/index.vue"

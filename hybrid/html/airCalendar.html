@@ -38,7 +38,8 @@
     <script src="./js/vue.js" type="text/javascript" charset="utf-8"></script>
     <script src="./js/vant.min.js"></script>
 	<script src="./js/echarts.min.js"></script>
-	<script src="./js/axios.min.js"></script>
+    <script src="./js/axios.min.js"></script>
+    <script src="./js/utils.js"></script>
 </head>
 <body >
 
@@ -309,7 +310,7 @@
                     {code:'130900',name:'沧州市'},
                     {code:'130300',name:'秦皇岛市'},
                     {code:'130800',name:'承德市'},
-                    {code:'131200',name:'张家口时'},
+                    {code:'131200',name:'张家口市'},
                 ],
                 dayDataArr:[],
                 option:{},//echart 图表数据
@@ -373,37 +374,39 @@
                     type:'day',
                     citycode:this.citycode
                 }
-                axios.get(`http://47.104.79.24:18061/wangge-boot/wangge/airMoniData/getCityMoniListByLongTime?starttime=${this.starttime}&endtime=${this.endtime}&type=day&citycode=${this.citycode}`)
-					.then(function (res) {
-							// _self.PopupShow = false;
-                            // _self.isLoading = false;
-						if(res.data.result && res.data.result.length>0)
-						{	
-                            _self.calendarData = res.data.result;
-                           
-                            _self.selectDate();
-                            _self.queryDayData();
-						}
-					})
-					.catch(function (error) {
-					console.log(error);
-				    });
+                getHttp('/airMoniData/getCityMoniListByLongTime',params).then(res=>{
+                    if(res.data.result && res.data.result.length>0){	
+                        _self.calendarData = res.data.result;
+                        _self.selectDate();
+                        _self.queryDayData();
+                    }else{
+                        _self.calendarData = [];
+                        _self.selectDate();
+                        _self.queryDayData();
+
+                    }
+                })
             },
             queryDayData(){//查询切换日期
                 let date = new Date(this.returnDate);         
                 let starttime = `${getDateYMD(dateAdd(new Date(this.returnDate),'d',-0),'')}000000`;
                 let endtime = `${getDateYMD(dateAdd(new Date(this.returnDate),'d',-0),'')}230000`;
-                axios.get(`http://47.104.79.24:18061/wangge-boot/wangge/airMoniData/getCityMoniListByLongTime?starttime=${starttime}&endtime=${endtime}&type=hour&citycode=${this.citycode}`)
-					.then(function (res) {
-						if(res.data.result && res.data.result.length>0)
-						{	
-                            _self.dayDataArr = res.data.result;
-                            _self.setBarEchart();
-						}
-					})
-					.catch(function (error) {
-					console.log(error);
-				    });
+                let params = {
+                    starttime:starttime,
+                    endtime:endtime,
+                    type:'hour',
+                    citycode:this.citycode
+                }
+                getHttp('/airMoniData/getCityMoniListByLongTime',params).then(res=>{
+                    if(res.data.result && res.data.result.length>0)
+                    {	
+                        _self.dayDataArr = res.data.result;
+                        _self.setBarEchart();
+                    }else{
+                        _self.dayDataArr = [];
+                        _self.setBarEchart();
+                    }
+                })
             },
             setBarEchart(){//设置折线图
                 //因为有可能日期不是全的
