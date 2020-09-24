@@ -3,7 +3,7 @@
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-	<title>污染天数级别分析</title>
+	<title>综合指数分担率</title>
     <style>
         body{
             margin:0;
@@ -33,7 +33,7 @@
         
     </style>
     <link rel="stylesheet" href="./js/vant.css">
-    <link rel="stylesheet" href="./css/pollutionDaysLevel.css">
+    <link rel="stylesheet" href="./css/indexShareRate.css">
 	<script src="./js/date.js"></script>
 	<script src="./js/aqi.js"></script>
     <script src="./js/vue.js" type="text/javascript" charset="utf-8"></script>
@@ -51,9 +51,8 @@
 	<div class="model"  :style="{height:load?'0':''}">
     </div>
         <div class="container">
-            
             <div class="time-nav">
-                <div class="nav-left" >
+                <div class="nav-left">
                     <div  class="picker" @click="clickPopupShows">
                         {{cityname}}<van-icon name="arrow-down" color="#d0d0d0" style="margin-left: 2px;" />
                     </div>
@@ -62,29 +61,21 @@
                         @confirm="cityConfirmChange"
                         @cancel="cityCancelChange" value-key="cityname" /> 
                 </div>
-                
-                <div class="nav-center">
-                    <div class="center-time" @click="timeClick">
-                        {{defaultDateStr}}
+                <div class="nav-right">
+                    <div class="right-time" @click="show=true;">
+                        {{timeStr}}
                     </div>
                      <!-- 日历开始 -->
-                     <van-calendar v-model="show" type="range" :min-date="minDate" :max-date="maxDate" :default-date="defaultDate"  color="#3c72f9" @confirm="onConfirm" />
+                     <van-calendar v-model="show"  :min-date="minDate" :max-date="maxDate"   color="#3c72f9" @confirm="onConfirm" />
                      <!-- 日历结束 -->
-
-                </div>
-                <div class="nav-right">
-                    <div class="nav-button" v-for="(item, index) in timeTypeArr" v-bind:class="[ item.code == timeType ? 'b_button' : '']"  @click="timeChanges(item)" :key="index">
-                        {{item.name}}
-                    </div>
                 </div>
             </div>
-            
             <div style="background: #f6f7f9;height: 10px;"></div>
-            
+
             <div class="chart-box airAqiLevel">
                 <div class="title">
                     <div class="radioBox"> <div class="radioMinBox"></div> </div>
-                    <div class="title-font">空气质量等级占比</div>
+                    <div class="title-font">日</div>
                 </div>
                 <div class="echart-box">
                     <div class="echart" id="echart1"></div>
@@ -95,7 +86,7 @@
             <div class="chart-box airAqiLevel">
                 <div class="title">
                     <div class="radioBox"> <div class="radioMinBox"></div> </div>
-                    <div class="title-font">污染天中首要污染物的占比</div>
+                    <div class="title-font">月</div>
                 </div>
                 <div class="echart-box">
                     <div class="echart" id="echart2"></div>
@@ -106,13 +97,12 @@
             <div class="chart-box airAqiLevel">
                 <div class="title">
                     <div class="radioBox"> <div class="radioMinBox"></div> </div>
-                    <div class="title-font">六项污染物贡献率分布</div>
+                    <div class="title-font">年</div>
                 </div>
                 <div class="echart-box">
                     <div class="echart" id="echart3"></div>
                 </div>
             </div>
-
         </div>   		
 </div>
 
@@ -180,25 +170,15 @@
                 ],
                 timeType:'month',
                 allData:[],
-                airPrimarypolObj:{'PM2.5':0,'PM10':0,'O3-8h':0,'NO2':0,'SO2':0,'CO':0,'-':0},//首要污染物统计
-                airPrimarypolName:{'PM2.5':'PM2.5','PM10':'PM10','CO':'CO','NO2':'NO2','SO2':'SO2','O3-8h':'O3','-':'无'},//首要污染物统计
-                airPrimarypolColor:{'PM2.5':'#ffcd3e','PM10':'#5cdfd7','O3':'#4e9ff0','O3-8h':'#4e9ff0','SO2':'#d0f23b','NO2':'#56dd37','CO':'#ff7840','无':'#eee'},//污染物相对颜色配置
-                airAqiLevelColor:{ '优':'#00e400','良':'#ffff00','轻度':'#ff7e00','中度':'#ff0000','重度':'#99004c','严重':'#7e0023'},
                 airCalculation:{'pm25':35,'pm10':70,'co':4,'no2':40,'so2':60,'o3_8h':163},//综合指数贡献比指数计算
                 airIndexName:{'pm25':'PM2.5','pm10':'PM10','co':'CO','no2':'NO2','so2':'SO2','o3_8h':'o3_8h'},//综合指数贡献比Name
-                // airIndexColor:{'pm25':'#389ffe','pm10':'#fec045','co':'#ff8cc3','no2':'#ac93f9','so2':'#32c6c8','o3_8h':'#f05e75'},//综合指数贡献比颜色
                 airIndexColor:{'pm25':'#ffcd3e','pm10':'#5cdfd7','co':'#ff7840','no2':'#56dd37','so2':'#d0f23b','o3_8h':'#4e9ff0'},//综合指数贡献比颜色
+                initDate:'2020-09-22',
+                timeStr:'今天',
             },
 		created() {
             _self = this;
-            let date = new Date();
-            let starttime = `${date.getFullYear()}/${addZero(date.getMonth()+1)}/01`;
-            let endtime = `${date.getFullYear()}/${date.getMonth()+1}/${date.getDate()}`;
-            this.defaultDate = [new Date(starttime),new Date(endtime) ]
-            this.defaultDateStr = `${date.getFullYear()}-${addZero(date.getMonth()+1)}-01 - ${date.getFullYear()}-${addZero(date.getMonth()+1)}-${addZero(date.getDate())}`
-            
-            this.starttime = `${getDateYMD(dateAdd(new Date(starttime.replace(/-/g, '/')),'h',-0),'')}000000`;
-            this.endtime = `${getDateYMD(dateAdd(new Date(endtime.replace(/-/g, '/')),'h',-0),'')}000000`;
+            this.initDate = `${getDateYMD(dateAdd(new Date(),'d',-0),'-')}`
 
             this.queryData()
         },  
@@ -208,69 +188,102 @@
 			 this.clientWidth = document.documentElement.clientWidth;
         },
         methods: {
+            clickPopupShows(){//点击城市
+                this.popupShows = true;
+            },
+            cityConfirmChange(e){//城市确定
+                if(e.citycode == this.citycode){
+                    this.popupShows = false;
+                    return 
+                }
+                this.citycode = e.citycode;
+                this.cityname = e.cityname;
+
+                this.popupShows = false;
+                this.queryData();//切换城市查询数据
+            }, 
+            cityCancelChange(){//城市取消
+                this.popupShows = false;
+            },
+            onConfirm(date){
+                this.show = false;
+                let today = new Date();
+                this.initDate = `${date.getFullYear()}/${date.getMonth()+1}/${date.getDate()}`
+                if( (today.getFullYear() == date.getFullYear()) && (today.getMonth()+1 == date.getMonth()+1) && (today.getDate() == date.getDate())  ){//当他为本年本月时 查询今天
+                    this.timeStr = '今天'
+                }else{
+                    this.timeStr = `${addZero(date.getFullYear())}-${addZero(date.getMonth()+1)}-${addZero(date.getDate())}`
+                }
+                
+                this.queryData();
+            },
             queryData(){
+                this.queryDayDate();
+                this.queryMonthDate();
+                this.queryYearDate();
+                
+            },
+            queryDayDate(){//查询当天的信息
+                let starttime = `${getDateYMD(dateAdd(new Date(this.initDate.replace(/-/g, '/')),'h',-0),'')}000000`;
+                let endtime = `${getDateYMD(dateAdd(new Date(this.initDate.replace(/-/g, '/')),'h',-0),'')}230000`;
                 let params = {
-                    starttime:this.starttime,
-                    endtime:this.endtime,
+                    starttime:starttime,
+                    endtime:endtime,
                     type:'day',
                     citycode:this.citycode,
                 }
                 getHttp('/chinaMoniData/getCityAirMoniListOnChinaByLongTime',params).then(res=>{
                     if(res.data.result && res.data.result.length>0){
-                        this.allData = res.data.result;
-                        this.ProcessingData()
+                        this.ProcessingDayData(res.data.result)
                     }else{
-                        this.allData = [];
-                        this.ProcessingData()
+                        this.ProcessingDayData([])
                     }
                 })
-            },
-            ProcessingData(){
-                let airAqiLevel = {'优':0,'良':0,'轻度':0,'中度':0,'重度':0,'严重':0};//
-                let airPrimarypol = {'PM2.5':0,'PM10':0,'O3-8h':0,'NO2':0,'SO2':0,'CO':0,'-':0}//首要污染物统计  {'PM2.5':0,'PM10':0,'O3-8h':0,'NO2':0,'SO2':0,'CO':0,'-':0}
-                let airIndexObj={'pm25':0,'pm10':0,'co':0,'no2':0,'so2':0,'o3_8h':0,}//综合指数贡献比数据
                 
-                this.allData.map(item=>{
-                    let aqiLevel = getAqiLevels(item.aqi);
-                    airAqiLevel[aqiLevel] = (airAqiLevel[aqiLevel] + 1);
-                    airPrimarypol[item['primarypol']] = (airPrimarypol[item['primarypol']] + 1);
-
+            },
+            ProcessingDayData(data){
+                let legendData = []
+                let seriesData = []
+                let airIndexObj={'pm25':0,'pm10':0,'co':0,'no2':0,'so2':0,'o3_8h':0,}//综合指数贡献比数据
+                let airIndex = 0;
+                data.map(item=>{
                     for(name in airIndexObj){
                         airIndexObj[name] = ( airIndexObj[name] + item[name])
                     }
                 })
-                
-                this.setAirAqilevelPie(airAqiLevel);
-                this.setAirPrimarypolPie(airPrimarypol);
-                this.setAirSexConcentration( airIndexObj)
-            },
-            setAirAqilevelPie(airAqiLevel){//设置空气质量饼图
-                let legendData = []
-                let seriesData = []
-                for(let key in airAqiLevel ){
-                    if( airAqiLevel[key]>0 ){
-                        legendData.push(key)
-                        seriesData.push({
-                            name: key,
-                            value: airAqiLevel[key],
-                            itemStyle:{color:this.airAqiLevelColor[key]}
-                        });
+                for(name in airIndexObj){
+                    if( airIndexObj[name]>0){
+                        //保留3位小数
+                        let value =  ( Math.floor((airIndexObj[name]/this.airCalculation[name]) * 1000) / 1000)
+                        airIndex += value;
+                        airIndexObj[name] =value
+                            seriesData.push({
+                                value:value,
+                                name:this.airIndexName[name],
+                                itemStyle:{color:this.airIndexColor[name]}
+                                
+                            })
+                        legendData.push(this.airIndexName[name])
                     }
                 }
                 let option = {
+                    title:{
+                        text: `综合指数${airIndex.toFixed(3)}`,
+                        x:'center', 
+                        y: 'bottom', 
+                        textStyle: {
+                            fontSize: 12,
+                            fontStyle: 'normal',
+                            fontWeight: 'normal',
+                        },
+                    },
                     tooltip: {
                         trigger: 'item',
-                        formatter: '{b}<br/> 天数 : {c}天 ({d}%)'
-                    },
-                    legend: {
-                        type: 'scroll',
-                        left: 'center',
-                        bottom: 10,
-                        data:legendData,
+                        formatter: '{b}<br/> 综指: {c} ({d}%)'
                     },
                     series: [
                         {
-                            name: '空气质量等级占比',
+                            name: '综指',
                             type: 'pie',
                             radius: '55%',
                             center: ['50%', '50%'],
@@ -289,33 +302,77 @@
                  // 使用刚指定的配置项和数据显示图表。
                  myChart.setOption(option);
             },
-            setAirPrimarypolPie(airPrimarypol){//设置首要污染物
+            queryMonthDate(){//查询月份信息
+                let today = new Date()
+                let date = new Date(this.initDate.replace(/-/g, '/') )
+                let start =  `${date.getFullYear()}/${date.getMonth()+1}/01`
+                let end = ''
+                if( (today.getFullYear() == date.getFullYear()) && (today.getMonth()+1 == date.getMonth()+1)  ){//当他为本年本月时 查询今天
+                    end = `${date.getFullYear()}/${date.getMonth()+1}/${today.getDate()}`
+                }else{
+                    end = `${date.getFullYear()}/${date.getMonth()+1}/${getLastDateDay(date)}`
+                }
+
+                let starttime = `${getDateYMD(dateAdd(new Date(start),'h',-0),'')}000000`;
+                let endtime = `${getDateYMD(dateAdd(new Date(end),'h',-0),'')}230000`;
+                let params = {
+                    starttime:starttime,
+                    endtime:endtime,
+                    type:'day',
+                    citycode:this.citycode,
+                }
+                getHttp('/chinaMoniData/getCityAirMoniListOnChinaByLongTime',params).then(res=>{
+                    if(res.data.result && res.data.result.length>0){
+                        this.ProcessingMonthData(res.data.result)
+                    }else{
+                        this.ProcessingMonthData(res.data.result)
+                    }
+                })
+            },
+            ProcessingMonthData(data){
                 let legendData = []
                 let seriesData = []
-                for(let key in airPrimarypol ){
-                    if( airPrimarypol[key]>0  && key != '-'){
-                        legendData.push(this.airPrimarypolName[key])
-                        seriesData.push({
-                            name:this.airPrimarypolName[key] ,
-                            value: airPrimarypol[key],
-                            itemStyle:{color:this.airPrimarypolColor[key]}
-                        });
+                let airIndexObj={'pm25':0,'pm10':0,'co':0,'no2':0,'so2':0,'o3_8h':0,}//综合指数贡献比数据
+                let airIndex = 0;
+                data.map(item=>{
+                    for(name in airIndexObj){
+                        airIndexObj[name] = ( airIndexObj[name] + item[name])
                     }
-                    
+                })
+                for(name in airIndexObj){
+                    if( airIndexObj[name]>0){
+                        //保留3位小数
+                        let avg =  (airIndexObj[name]/data.length)
+                        let value =  ( Math.floor((avg/this.airCalculation[name]) * 1000) / 1000)
+                        airIndex += value;
+                        airIndexObj[name] =value
+                            seriesData.push({
+                                value:value,
+                                name:this.airIndexName[name],
+                                itemStyle:{color:this.airIndexColor[name]}
+                                
+                            })
+                        legendData.push(this.airIndexName[name])
+                    }
                 }
                 let option = {
+                    title:{
+                        text: `综合指数${airIndex.toFixed(3)}`,
+                        x:'center', 
+                        y: 'bottom', 
+                        textStyle: {
+                            fontSize: 12,
+                            fontStyle: 'normal',
+                            fontWeight: 'normal',
+                        },
+                    },
                     tooltip: {
                         trigger: 'item',
-                        formatter: '{b}<br/> 天数 : {c}天 ({d}%)'
-                    },
-                    legend: {
-                        left: 'center',
-                        bottom: 10,
-                        data:legendData,
+                        formatter: '{b}<br/> 综指: {c} ({d}%)'
                     },
                     series: [
                         {
-                            name: '污染天中首要污染物的占比',
+                            name: '综指',
                             type: 'pie',
                             radius: '55%',
                             center: ['50%', '50%'],
@@ -334,37 +391,76 @@
                  // 使用刚指定的配置项和数据显示图表。
                  myChart.setOption(option);
             },
-            setAirSexConcentration(airIndexObj){//设置六项污染浓度
+            queryYearDate(){//查询年份信息
+                let today = new Date()
+                let date = new Date(this.initDate.replace(/-/g, '/') )
+                let start =  `${date.getFullYear()}/01/01`;
+                let end = '';
+                if( (today.getFullYear() == date.getFullYear()) && (today.getMonth()+1 == date.getMonth()+1)  ){//当他为本年本月时 查询今天
+                    end = `${date.getFullYear()}/${date.getMonth()+1}/${today.getDate()}`
+                }else{
+                    end = `${date.getFullYear()}/${date.getMonth()+1}/${getLastDateDay(date)}`
+                }
+                let starttime = `${getDateYMD(dateAdd(new Date(start),'h',-0),'')}000000`;
+                let endtime = `${getDateYMD(dateAdd(new Date(end),'h',-0),'')}230000`;
+                let params = {
+                    starttime:starttime,
+                    endtime:endtime,
+                    type:'day',
+                    citycode:this.citycode,
+                }
+                getHttp('/chinaMoniData/getCityAirMoniListOnChinaByLongTime',params).then(res=>{
+                    if(res.data.result && res.data.result.length>0){
+                        this.ProcessingYearData(res.data.result)
+                    }else{
+                        this.ProcessingYearData(res.data.result)
+                    }
+                })
+            },
+            ProcessingYearData(data){
                 let legendData = []
                 let seriesData = []
-                for(name in airIndexObj){
-                        if( airIndexObj[name]>0){
-                            let avg =  (airIndexObj[name]/this.allData.length)
-                            //保留3位小数
-                            let value =  ( Math.floor((avg/this.airCalculation[name]) * 1000) / 1000)
-                            airIndexObj[name] =value
-                                seriesData.push({
-                                    value:value,
-                                    name:this.airIndexName[name],
-                                    itemStyle:{color:this.airIndexColor[name]}
-                                    
-                                })
-                            legendData.push(this.airIndexName[name])
-                        }
+                let airIndexObj={'pm25':0,'pm10':0,'co':0,'no2':0,'so2':0,'o3_8h':0,}//综合指数贡献比数据
+                let airIndex = 0;
+                data.map(item=>{
+                    for(name in airIndexObj){
+                        airIndexObj[name] = ( airIndexObj[name] + item[name])
                     }
+                })
+                for(name in airIndexObj){
+                    if( airIndexObj[name]>0){
+                        //保留3位小数
+                        let avg =  (airIndexObj[name]/data.length)
+                        let value =  ( Math.floor((avg/this.airCalculation[name]) * 1000) / 1000)
+                        airIndex += value;
+                        airIndexObj[name] =value
+                            seriesData.push({
+                                value:value,
+                                name:this.airIndexName[name],
+                                itemStyle:{color:this.airIndexColor[name]}
+                                
+                            })
+                        legendData.push(this.airIndexName[name])
+                    }
+                }
                 let option = {
+                    title:{
+                        text: `综合指数${airIndex.toFixed(3)}`,
+                        x:'center', 
+                        y: 'bottom', 
+                        textStyle: {
+                            fontSize: 12,
+                            fontStyle: 'normal',
+                            fontWeight: 'normal',
+                        },
+                    },
                     tooltip: {
                         trigger: 'item',
-                        formatter: '{b}<br/> 分指数 : {c}({d}%)'
-                    },
-                    legend: {
-                        left: 'center',
-                        bottom: 10,
-                        data:legendData,
+                        formatter: '{b}<br/> 综指: {c} ({d}%)'
                     },
                     series: [
                         {
-                            name: '六项污染物贡献率分布',
+                            name: '综指',
                             type: 'pie',
                             radius: '55%',
                             center: ['50%', '50%'],
@@ -383,69 +479,8 @@
                  // 使用刚指定的配置项和数据显示图表。
                  myChart.setOption(option);
             },
-            timeClick(){
-                this.show = true;
-            },
-            onConfirm(date){
-                const [start, end] = date;
-                this.show = false;
-
-                let starttime = `${getDateYMD(dateAdd(new Date(start),'d',-0),'-')}`;
-                let endtime = `${getDateYMD(dateAdd(new Date(end),'d',0),'-')}`;
-                this.defaultDateStr = `${getDateYMD(dateAdd(new Date(starttime.replace(/-/g, '/')),'d',-0),'-')}  -  ${getDateYMD(dateAdd(new Date(endtime.replace(/-/g, '/')),'d',-0),'-')}`
-
-                this.starttime = `${getDateYMD(dateAdd(new Date(starttime.replace(/-/g, '/')),'h',-0),'')}000000`;
-                this.endtime = `${getDateYMD(dateAdd(new Date(endtime.replace(/-/g, '/')),'h',-0),'')}000000`;
-
-                this.queryData();
-            },
-            cityConfirmChange(e){//确定
-                if(e.citycode == this.citycode){
-                    this.popupShows = false;
-                    return 
-                }
-                this.citycode = e.citycode;
-                this.cityname = e.cityname;
-
-                this.popupShows = false;
-                this.queryData();//切换城市查询数据
-            }, 
-            cityCancelChange(){//取消
-                this.popupShows = false;
-            },
-            clickPopupShows(){
-                this.popupShows = true;
-            },
-            timeChanges(e){
-                
-                if(e.code == this.timeType){
-                    return
-                }
-                this.timeType = e.code;
-                if( this.timeType == 'year'){//当他为年时
-                    // defaultDate:[new Date('2020/01/01'),new Date('2020/09/22')],//默认选中
-                    let date = new Date();
-                    let starttime = `${date.getFullYear()}/01/01`;
-                    let endtime = `${date.getFullYear()}/${date.getMonth()+1}/${date.getDate()}`;
-
-                    this.defaultDate = [new Date(starttime),new Date(endtime) ]
-                    this.starttime = `${getDateYMD(dateAdd(new Date(starttime.replace(/-/g, '/')),'h',-0),'')}000000`;
-                    this.endtime = `${getDateYMD(dateAdd(new Date(endtime.replace(/-/g, '/')),'h',-0),'')}000000`;
-
-                    this.defaultDateStr = `${date.getFullYear()}-01-01 - ${date.getFullYear()}-${addZero(date.getMonth()+1)}-${addZero(date.getDate())}`
-                }else{
-                    let date = new Date();
-                    let starttime = `${date.getFullYear()}/${addZero(date.getMonth()+1)}/01`;
-                    let endtime = `${date.getFullYear()}/${date.getMonth()+1}/${date.getDate()}`;
-                    this.defaultDate = [new Date(starttime),new Date(endtime) ]
-                    
-                    this.starttime = `${getDateYMD(dateAdd(new Date(starttime.replace(/-/g, '/')),'h',-0),'')}000000`;
-                    this.endtime = `${getDateYMD(dateAdd(new Date(endtime.replace(/-/g, '/')),'h',-0),'')}000000`;
-                    this.defaultDateStr = `${date.getFullYear()}-${addZero(date.getMonth()+1)}-01 - ${date.getFullYear()}-${addZero(date.getMonth()+1)}-${addZero(date.getDate())}`
-                }
-                this.queryData()
-            }
-        },
+            
+        }    
 		
 	});
 	

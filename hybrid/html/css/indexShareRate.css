@@ -1,0 +1,78 @@
+.container {
+  height: 100%;
+  width: 100%;
+}
+.container .time-nav {
+  height: 40px;
+  display: flex;
+  width: 100%;
+  border-bottom: 1px solid #cecfd1;
+}
+.container .time-nav .nav-left {
+  height: 100%;
+  font-size: 12px;
+  width: 30%;
+  color: #656565;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.container .time-nav .nav-left .picker {
+  height: 38px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.container .time-nav .nav-right {
+  height: 100%;
+  width: 70%;
+  display: flex;
+  font-size: 12px;
+  justify-content: center;
+  align-items: center;
+}
+.container .time-nav .nav-right .right-time {
+  width: 80%;
+  height: 100%;
+  color: #2e64fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.container .chart-box {
+  height: 350px;
+  width: 100%;
+}
+.container .chart-box .title {
+  width: 100%;
+  height: 50px;
+  display: flex;
+  align-items: center;
+}
+.container .chart-box .title .radioBox {
+  width: 15px;
+  height: 15px;
+  margin-left: 15px;
+  background-color: #bdd4fd;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.container .chart-box .title .radioBox .radioMinBox {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background-color: #208eed;
+}
+.container .chart-box .title .title-font {
+  margin-left: 8px;
+}
+.container .chart-box .echart-box {
+  height: calc(100% - 50px);
+}
+.container .chart-box .echart-box .echart {
+  height: 100%;
+  width: 100%;
+}
