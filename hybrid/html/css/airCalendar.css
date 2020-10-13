@@ -1,77 +1,7 @@
-.container .calendar {
-  width: 100vw;
+.page {
+  min-height: 100vh;
+  overflow: hidden;
 }
-.container .calendar .title {
-  display: flex;
-  margin-left: 50px;
-}
-.container .calendar .title .nex {
-  width: 60px;
-  height: 40px;
-  text-align: center;
-  line-height: 40px;
-}
-.container .calendar .week-header {
-  margin: 0;
-  padding: 10px 0;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-around;
-}
-.container .calendar .week-header .month {
-  display: inline-block;
-  width: 13.6%;
-  text-align: center;
-}
-.container .calendar .week-date {
-  padding: 0;
-  background: #ffffff;
-  margin: 0;
-  display: flex;
-  flex-wrap: wrap;
-  font-size: 12px;
-  justify-content: space-around;
-}
-.container .calendar .week-date .every-day {
-  display: inline-block;
-  width: 14.2%;
-  padding-bottom: 5px;
-}
-.container .calendar .week-date .every-day .every-box {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 80%;
-  height: 45px;
-  margin: 0 10%;
-  flex-wrap: wrap;
-  background: #eee;
-}
-.container .calendar .week-date .every-day .every-box .top-days {
-  height: 20px;
-  line-height: 20px;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.container .calendar .week-date .every-day .every-box .bottom-primarypol {
-  height: 30px;
-  line-height: 10px;
-  width: 100%;
-  font-size: 8px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.container .calendar .week-date .every-day .dateSelect {
-  border: 1px solid #92a7f6;
-}
-
-
-
-
-
 .container {
   height: 100vh;
 }
@@ -81,7 +11,7 @@
   display: flex;
 }
 .container .navTitle .nav-city {
-  width: 80px;
+  width: 70px;
   height: 100%;
 }
 .container .navTitle .nav-city .picker {
@@ -92,7 +22,7 @@
   align-items: center;
 }
 .container .navTitle .nav-date {
-  width: calc(100% - 180px );
+  width: calc(100% - 170px);
   height: 100%;
   display: flex;
   justify-content: center;
@@ -147,12 +77,6 @@
   width: 80px;
   height: 30px;
   font-size: 12px;
-  background-color: #fff;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border: 1px solid #dddddd;
-  border-radius:  5px;
 }
 .container .month {
   width: 100vw;
@@ -176,24 +100,19 @@
 .container .month .title-level .level-left {
   padding-left: 10px;
   width: 70px;
-  font-size: 14px;
 }
 .container .month .title-level .level-right {
-  width: calc(100% - 70px );
+  width: calc(100% - 70px);
   height: 100%;
   display: flex;
 }
 .container .month .title-level .level-right .level-li {
   display: flex;
   align-items: center;
-  /* margin: 0 5px; */
 }
 .container .month .title-level .level-right .level-li .level-text {
-  font-size: 12px ;
+  margin: 0 5px;
   color: #75797a;
-  display: flex;
-  margin-right: 5px;
-  margin-left: 5px;
 }
 .container .month .title-level .level-right .level-li .level-circular {
   width: 15px;
@@ -206,7 +125,6 @@
 .container .month .title-level .level-right .level-li .level-circular .texts {
   font-size: 10px;
   color: #FFF;
-  line-height: 15px;
 }
 .container .month .primarypols {
   width: 100%;
@@ -218,7 +136,6 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 14px;
 }
 .container .month .primarypols .primarypols-right {
   width: calc(100% - 90px);
@@ -301,7 +218,7 @@
   background: #FFF;
 }
 .container .dayInfo .dayInfo-left .left-box .border-white .box-content .box-center {
-  height: calc(52%);
+  height: calc(100% - 48px);
   width: 100%;
   display: flex;
   justify-content: center;
@@ -323,7 +240,7 @@
   font-size: 12px;
 }
 .container .dayInfo .dayInfo-right {
-  width: calc(100% - 45%);
+  width: calc(100% - 145px);
   height: 100%;
   display: flex;
   align-items: center;
@@ -354,7 +271,7 @@
   color: #262626;
 }
 .container .dayInfo .dayInfo-right .right-title .title-bottom {
-  height: calc(38%);
+  height: calc(100% - 62px);
   width: 100%;
   display: flex;
   flex-wrap: wrap;
@@ -377,7 +294,7 @@
 }
 .container .greyArea {
   background: #f5f6f8;
-  width: calc(100vw - 20px);
+  width: 100vw;
   padding: 0 10px;
 }
 .container .greyArea .chart {

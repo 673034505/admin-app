@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<title>综合指数分担率</title>
+    <style>
+        body{
+            margin:0;
+			margin: 0;
+			    padding: 0;
+        }
+		::-webkit-scrollbar {
+			/*隐藏滚轮*/
+			display: none;
+        }     
+        div{
+            -webkit-user-select:none;
+            -moz-user-select:none;
+            -ms-user-select:none;
+            user-select:none;
+        }   
+		.competitionCity{
+			height: 100vh;
+			width: 100vw;
+			overflow: hidden;
+			overflow-y: auto;
+			position: relative;
+		}
+		.model{
+			width: 100vh;height: 100vh;background-color: #FFFFFF;
+        }
+        
+    </style>
+    <link rel="stylesheet" href="./js/vant.css">
+    <link rel="stylesheet" href="./css/indexShareRate.css">
+	<script src="./js/date.js"></script>
+	<script src="./js/aqi.js"></script>
+    <script src="./js/vue.js" type="text/javascript" charset="utf-8"></script>
+    <script src="./js/vant.min.js"></script>
+	<script src="./js/echarts.min.js"></script>
+    <script src="./js/axios.min.js"></script>
+    <script src="./js/uni.webview.1.5.2.js"></script>
+    <script src="./js/utils.js"></script>
+</head>
+<body >
+
+
+<div class="competitionCity" id="app">
+	<!-- 优化当页面一开始进入时加载出问题 -->
+	<div class="model"  :style="{height:load?'0':''}">
+    </div>
+        <div class="container">
+            
+        </div>    		
+</div>
+
+
+
+<script type="module" >
+	var _self;
+	var vm = new Vue({
+        el : "#app",
+		data : {
+			   //下拉刷新
+			   load:true,//窗体加载
+               clientWidth:'',
+            },
+		created() {
+            _self = this;
+
+        },  
+		mounted : function(){
+			this.load = true
+			 //解决键盘出来 屏幕缩小的问题
+             this.clientWidth = document.documentElement.clientWidth;
+        },
+        methods: {
+
+        }    
+		
+	});
+	
+</script>
+
+</body>
+</html>

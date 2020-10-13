@@ -1,0 +1,281 @@
+.container{
+    height: 100%;
+    width: 100%;
+    //日历样式开始
+    .calendar{
+        height: 440px;
+        width: 100%;
+    }
+    .month-close-right{
+        height: 40px;
+        width: 70px;
+        position: absolute;
+        right: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .minute{
+        width: 100%;
+        height: 60px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        .minute-box{
+            height: 50px;
+            width: 100%;
+            font-size: 14px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-top: 1px solid;
+            .minute-span{
+                color: #cccccc;
+                border: 1px solid #919191;
+                padding:2px 5px;
+                border-radius: 2px;
+            }
+        }
+    }
+    .calendar-bottom{
+        height: 50px;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        .calendar-button{
+            height: 36px;
+            padding: 0 10px;
+            width: calc(100% - 60px);
+            color: rgb(255, 255, 255);
+            background: rgb(60, 114, 249);
+            border-color: rgb(60, 114, 249);
+            border-radius: 999px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    }
+     //日历样式结束
+    .time-nav{
+        height: 40px;
+        display: flex;
+        width: 100%;
+        border-bottom:1px solid #cecfd1;
+        position: relative;
+        .nav-left{
+            width: 20%;
+            height: 100%;
+        }
+        .nav-center{
+            width: 50%;
+            height: 100%;
+            font-size: 14px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            .right-time{
+                width: 90%;
+                height: 100%;
+                color: #2e64fa;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+        .nav-right{
+            height: 100%;
+            width: 30%;
+            display: flex;
+            font-size: 12px;
+            justify-content: center;
+            align-items: center;
+            margin-right: 3px;
+            color: #656565;
+            position: absolute;
+            right: 0;
+            .nav-button{
+                font-size: 12px;
+                width: 45%;
+                height: 24px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background-color: #fff;
+                border: 1px solid #bbbbbb;
+            }
+            .nav-button:nth-child(1){
+                border-top-left-radius: 5px;
+                border-bottom-left-radius: 5px;
+                border-right: 0;
+            }
+            .nav-button:nth-child(2){
+                border-right: 0;
+            }
+            .nav-button:nth-child(3){
+                border-top-right-radius: 5px;
+                border-bottom-right-radius: 5px;
+            }
+            .b_button{
+                color: #FFF;
+                background: #1f8cf1;
+            }
+        }
+    }
+    .airButton{
+        height: 50px;
+        width: calc(100% - 10px);
+        padding: 0 5px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 10px;
+        .a-button{
+            height: 20px;
+            width: 11.8%;
+            border-radius: 5px;
+            background: #FFF;
+            text-align: center;
+            line-height: 21px;
+            color: #686868;
+            margin: 0 auto;
+            border: 1px solid #dddddd;
+        }
+        .b_button{
+            color: #FFF;
+            background: #1f8cf1;
+        }
+    }
+    .air-checkbox{
+        height: 40px;
+        width: calc(100% - 20px);
+        display: flex;
+        padding: 0 10px;
+        .air-flex{
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            .b-text{
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                font-size: 10px;
+            }
+        }
+        .airButton{
+            height: 42px;
+            width: 100%;
+            .a-button{
+                height: 28px;
+                width: 11.3%;
+                border-radius: 5px;
+                background: #FFF;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                border: 1px solid #eee;
+                color: #686868;
+            }
+            .b_button{
+                color: #FFF;
+                background: #1f8cf1;
+            }
+        }
+    }
+    .echarts-box{
+        width: 100%;
+        height: 280px;
+        .echarts-title{
+            width: calc(100% - 20px);
+            padding: 0 10px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+            .ec-title{
+                margin-left: 5px;
+            }
+            .radioBox{
+                width: 15px;
+                height: 15px;
+                background-color: #bdd4fd;
+                border-radius: 50%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                .radioMinBox{
+                    width: 9px;
+                    height: 9px;
+                    border-radius: 50%;
+                    background-color: #208eed;
+                }
+            }
+        }
+        .chart-box{
+            height: calc(100% - 30px);
+            width: 100%;
+            .echarts{
+                width: 100%;
+                height: 100%;
+            }
+        }
+    }
+    .site-box{
+        width: 100%;
+        .site-title{
+            border-bottom: 3px solid #218cee;
+            width: 100%;
+            height: 50px;
+            color: #000;
+            font-weight: 700;
+            font-size: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .site-checkbox-box{
+            width: calc(100% - 20px);
+            padding: 0 10px;
+            display: flex;
+            flex-wrap: wrap;
+            .site-li{
+                width: 50%;
+                height: 30px;
+                font-size: 12px;
+                display: flex;
+                align-items: center;
+            }
+        }
+        .site-button-box{
+            width: calc(100% - 20px);
+            padding: 0 10px;
+            .site-button{
+                position: relative;
+                display: inline-block;
+                box-sizing: border-box;
+                height: 30px;
+                margin: 0;
+                padding: 0;
+                font-size: 16px;
+                line-height: 30px;
+                text-align: center;
+                border-radius: 2px;
+                cursor: pointer;
+                -webkit-transition: opacity .2s;
+                transition: opacity .2s;
+                -webkit-appearance: none;
+                padding: 0 10px;
+                font-size: 14px;
+                border: 1px solid #6a6a6a;
+                border-radius: 5px;
+                margin-top: 10px;
+                margin-left: 2%;
+            }
+            .b_button{
+                color: #FFF;
+                background: #1f8cf1;
+                border: 1px solid #1f8cf1;
+            }
+        }
+    }
+}

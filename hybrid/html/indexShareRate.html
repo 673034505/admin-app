@@ -178,8 +178,8 @@
             },
 		created() {
             _self = this;
-            this.initDate = `${getDateYMD(dateAdd(new Date(),'d',-0),'-')}`
-
+            this.initDate = `${getDateYMD(dateAdd(new Date(),'d',-1),'-')}`
+            this.timeStr = `${getDateYMD(dateAdd(new Date(),'d',-1),'-')}`
             this.queryData()
         },  
 		mounted : function(){

@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<title>单站多参数对比</title>
+    <style>
+        body{
+            margin:0;
+			margin: 0;
+			    padding: 0;
+        }
+		::-webkit-scrollbar {
+			/*隐藏滚轮*/
+			display: none;
+        }     
+        div{
+            -webkit-user-select:none;
+            -moz-user-select:none;
+            -ms-user-select:none;
+            user-select:none;
+        }   
+		.competitionCity{
+			height: 100vh;
+			width: 100vw;
+			overflow: hidden;
+			overflow-y: auto;
+			position: relative;
+		}
+		.model{
+			width: 100vh;height: 100vh;background-color: #FFFFFF;
+        }
+        
+    </style>
+    <link rel="stylesheet" href="../js/vant.css">
+    <link rel="stylesheet" href="../css/singleStationComparison.css">
+	<script src="../js/date.js"></script>
+	<script src="../js/aqi.js"></script>
+    <script src="../js/vue.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../js/vant.min.js"></script>
+	<script src="../js/echarts.min.js"></script>
+    <script src="../js/axios.min.js"></script>
+    <script src="../js/uni.webview.1.5.2.js"></script>
+    <script src="../js/utils.js"></script>
+</head>
+<body >
+
+
+<div class="competitionCity" id="app">
+	<!-- 优化当页面一开始进入时加载出问题 -->
+	<div class="model"  :style="{height:load?'0':''}">
+    </div>
+        <div class="container">
+            <div class="time-nav">
+                <div class="nav-left">
+
+                </div>
+                <div class="nav-center">
+                    <div class="right-time" @click="show=true;">
+                        <!-- 09:22 15:00 - 09-23 15:00 -->
+                        {{timeStr}}
+                    </div>
+                    <van-popup v-model="show" round position="bottom"  >
+                        <div class="month-close-right"  @click="show=false">
+                            <van-icon name="cross"  />
+                        </div>
+                        <div class="calendar">
+                            <van-calendar
+                            title="日期选择"
+                            :poppable="false"
+                            color="#3c72f9"
+                            type="range" 
+                            :min-date="minDate" 
+                            :max-date="maxDate"
+                            :default-date="defaultDate"
+                            :show-confirm="false"
+                            :style="{ height: '440px' }"
+                            @select="calendarSelectChange"
+                            />
+                        </div>
+                        
+                        <div class="minute" v-if="timeType!='day'">
+                            <div class="minute-box">
+                                <div class="minute-left"  @click="show1 = true">
+                                    {{starttimeStr}} {{starHour}}时
+                                </div>
+                                &nbsp;
+                                -
+                                &nbsp;
+                                <div class="minute-right"  @click="show2 = true">
+                                    {{enttimeStr}} {{endHour}}时
+                                </div>
+                            </div>
+                        </div>
+                        <div class="calendar-bottom">
+                            <div class="calendar-button" @click="timeclick">
+                                确定
+                            </div>
+                        </div>
+                        
+                    </van-popup>
+                </div>
+
+                <!-- 小时选择开始 -->
+                <van-popup v-model="show1" round position="bottom"  >
+                    <van-picker show-toolbar  :columns="timeArr"  
+                    @confirm="timeConfirmChange1"
+                    @cancel="show1 = false" /> 
+                </van-popup>
+                <van-popup v-model="show2" round position="bottom"  >
+                    <van-picker show-toolbar  :columns="timeArr"  
+                    @confirm=" timeConfirmChange2"
+                    @cancel="show2 = false" /> 
+                </van-popup>
+                <!-- 小时选择结束 -->
+
+                <div class="nav-right">
+                    <div class="nav-button" v-for="(item, index) in timeTypeArr" v-bind:class="[ item.code == timeType ? 'b_button' : '']"  @click="timeChanges(item)" :key="index">
+                        {{item.name}}
+                    </div>
+                </div>
+            </div>
+            <div class="air-title">
+                请选择污染因子(可多选)
+            </div>
+            <div class="air-checkbox">
+                <div class="switch-box">
+                    <van-checkbox-group v-model="airArr"  direction="horizontal" @change="airChanges">
+                        <van-checkbox :name="item.code" shape="square" v-for="(item, index) in airButtonArr" :key="index" > <span v-html="item.html" class="item-font"></span> </van-checkbox> 
+                      </van-checkbox-group>
+                </div>
+            </div>
+
+            <div class="echarts-box">
+                <div class="echarts-title">
+                    <div class="radioBox"> <div class="radioMinBox"></div> </div>
+                    <div class="ec-title">{{siteName}}多参变化趋势</div>
+                </div>
+                <div class="chart-box">
+                    <div id="echarts1" class="echarts" ref="echarts1"></div>
+                </div>
+            </div>
+
+            <div class="site-box">
+                <div class="site-title">
+                    国控站
+                </div>
+                <div class="site-button-box">
+                    <div class="site-button" v-bind:class="[ item.name == siteName ? 'b_button' : '']"  v-for="(item, index) in gkArr" @click="cityButtomChange(item)"  :key="index">
+                        {{item.name}}
+                    </div>
+                </div>
+            </div>
+
+            <div class="site-box">
+                <div class="site-title">
+                    企业站
+                </div>
+                <div class="site-button-box">
+                    <div class="site-button" v-bind:class="[ item.name == siteName ? 'b_button' : '']"  v-for="(item, index) in qyArr" @click="cityButtomChange(item)" :key="index">
+                        {{item.name}}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="site-box">
+                <div class="site-title">
+                    通道站
+                </div>
+                <div class="site-button-box">
+                    <div class="site-button" v-bind:class="[ item.name == siteName ? 'b_button' : '']"  v-for="(item, index) in tdArr" @click="cityButtomChange(item)" :key="index">
+                        {{item.name}}
+                    </div>
+                </div>
+            </div>
+
+            
+        </div>    		
+</div>
+
+
+
+<script type="module" >
+	var _self;
+	var vm = new Vue({
+        el : "#app",
+		data : {
+			   //下拉刷新
+			   load:true,//窗体加载
+               clientWidth:'',
+               minDate:new Date('1980'),
+               maxDate:new Date(),
+               defaultDate:[],
+               timeTypeArr:[
+                    {code:'minute',name:"分钟"},
+                    {code:'hour',name:"小时"},
+                    {code:'day',name:"日"},
+                ],
+                timeType:'hour',
+                show:false,
+                show1:false,//小时选择器1
+                show2:false,//小时选择器2
+                timeStr:'',
+                starttimeStr:'09月08',
+                enttimeStr:'09月08日',
+                starHour:'22',
+                endHour:'10',
+                starttime:'',
+                endtime:'',
+                timeArr:[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23],
+                airArr: ['aqi'],
+                airButtonArr:[
+                    {code:'aqi',name:'AQI',html:'AQI'},
+                    {code:'pm25',name:'PM2.5',html:'PM<sub>2.5</sub>'},
+                    {code:'pm10',name:'PM10',html:'PM<sub>10</sub>'},
+                    {code:'o3',name:'O3',html:'O<sub>3</sub>'},
+                    {code:'so2',name:'SO2',html:'SO<sub>2</sub>'},
+                    {code:'no2',name:'NO2',html:'NO<sub>2</sub>'},
+                    {code:'co',name:'CO',html:'CO'},
+                ],
+                airColor:{'aqi':'#42cb61','pm25':'#3577f1','pm10':'#4cccb3','o3_8h':'#f1a905','o3':'#f1a905','so2':'#f5516c','no2':'#9560e6','co':'#46cdfc' },
+                airName:{'aqi':'AQI','pm25':'PM2.5','pm10':'PM10','o3_8h':'O3','o3':'O3','so2':'SO2','no2':'NO2','co':'CO' },
+                siteName:"市环保局",
+                gkArr:[//国控站
+                    {name:'市环保局'},
+                    {name:'达活泉'},
+                    {name:'邢师高专'},
+                    {name:'路桥公司'},
+                ],
+                tdArr:[],//通道站
+                qyArr:[],//企业站
+                allData:[],
+                allObj:[],
+            },
+		created() {
+            _self = this;
+            let date = new Date();
+            let starttime = `${getDateYMDH(dateAdd(new Date(),'h',-12),'-')}:00:00`;
+            let endtime = `${getDateYMDH(dateAdd(new Date(),'h',-0),'-')}:00:00`;
+            this.starHour = addZero(new Date(starttime).getHours());
+            this.endHour = addZero(new Date().getHours());
+            //初始化日期
+            this.defaultDate = [new Date(`${getDateYMD(dateAdd(new Date(starttime),'h',-0),'-')}`),new Date(endtime) ]
+            //
+            this.starttime = starttime;
+            this.endtime = endtime;
+            this.queryData()
+        },  
+		mounted : function(){
+			this.load = true
+			 //解决键盘出来 屏幕缩小的问题
+			 this.clientWidth = document.documentElement.clientWidth;
+        },
+        methods: {
+            queryData(){//查询数据
+                let start = new Date(this.starttime)
+                let end = new Date(this.endtime)
+                let timeStr = '';
+                let starttime = '';
+                let endtime = '';
+                if(this.timeType  == 'day'){
+
+                }else{
+                    timeStr = `${start.getMonth()+1}-${start.getDate()} ${start.getHours()}:00 - ${end.getMonth()+1}-${end.getDate()} ${end.getHours()}:00`
+                    starttime = `${getDateYMDH(dateAdd(new Date(this.starttime),'h',-0),'')}0000`;
+                    endtime = `${getDateYMDH(dateAdd(new Date(this.endtime),'h',-0),'')}0000`;
+                }
+                this.timeStr = timeStr;
+
+                let params = {
+                    starttime:starttime,
+                    endtime:endtime,
+                    datatype:'all',
+                    timetype:this.timeType,
+                }
+                getHttp('/airMoniData/getSplineByLongTime',params).then(res=>{
+                    if(res.data.result && res.data.result.length>0){
+                        this.allData = res.data.result;
+                        this.ProcessingData()
+                    }else{
+                        this.allData = [];
+                        this.ProcessingData()
+                    }
+                })
+            },
+            ProcessingData(){//数据处理
+                let obj = {}
+                this.allData.map(item=>{
+                    if( obj[item.stationname]){
+                        obj[item.stationname].push(item)
+                    }else{
+                        obj[item.stationname] = []
+                    }
+                })
+                this.tdArr = [];
+                this.qyArr = []
+                for(let key in obj){
+                    if( `${key}`.indexOf('通道') > -1){//当他为通道站 保存起来
+                        this.tdArr.push({name:`${key}`})
+                    }else{
+                        if( key == '市环保局' || key == '达活泉' || key == '邢师高专' || key == '路桥公司' ){
+
+                        }else{
+                            this.qyArr.push({name:`${key}`})
+                        }
+                    }
+                }
+                this.allObj = obj;
+                this.setLineChart()
+            },
+            setLineChart(){//设置折线图
+                let seriesDate = [];
+                let legendArr = []
+                
+                if(JSON.stringify(this.airArr) != '[]' ){
+                    let colorIndex = 0;
+                    this.airArr.map(item=>{
+                        let arr = []
+                        for (let index = 0; index < this.allObj[this.siteName].length; index++) {
+                            arr.push([ this.allObj[this.siteName][index]['datatime'], this.allObj[this.siteName][index][item]])
+                        }
+                        seriesDate.push({
+                            name: this.airName[item],
+                            type: 'line',
+                            symbol: 'none',
+                            data:arr,
+                            color:this.airColor[item],
+                            itemStyle: {
+                                normal: {
+                                    lineStyle: {
+                                        width:1// 0.1的线条是非常细的了
+                                    }
+                                }
+                            },
+                        })
+                        legendArr.push( this.airName[item])
+                    })
+                }
+                let Labelformatter =  null;
+                // if(this.timeCode == 'month'){
+                //     Labelformatter = function(params,index){
+                //         let date = new Date(params)
+                //         let str = `${date.getMonth()+1}月`;
+                //         return str
+                //     }
+                // }else{
+                //     Labelformatter = function(params,index){
+                //         let date = new Date(params)
+                //         let str;
+                //         if(date.getHours() == 0 || date.getMinutes() > 0 || date.getSeconds() > 0){
+                //             str  = index === 0 ? '':`${date.getMonth() +1}月${date.getDate()}日`
+                //         }else{
+                //             str  = index === 0 ? '':`${date.getHours()}:00`
+                //         }
+                //         return str
+                //     }
+                // }
+                
+                Labelformatter = function(params,index){
+                        let date = new Date(params)
+                        let str;
+                        if(date.getHours() == 0 || date.getMinutes() > 0 || date.getSeconds() > 0){
+                            str  = index === 0 ? '':`${date.getMonth() +1}月${date.getDate()}日`
+                        }else{
+                            str  = index === 0 ? '':`${date.getHours()}:00`
+                        }
+                        return str
+                    }
+                let _self = this;
+                let option = {
+                    tooltip: {
+                        trigger: 'axis',
+                        confine:true,
+                        formatter:function(params) {
+                            let time = '';
+                            let timeStr ='';
+                            let valueStr = ''
+                            time = new Date(params[0].value[0]);
+                            if(_self.timeType == 'month' ){
+                                timeStr = `${addZero(time.getMonth()+1)} ${time.getFullYear()}`;
+                            }else if(_self.timeType == 'day' ){
+                                timeStr = `${addZero(time.getMonth()+1)}-${addZero(time.getDate())}  ${time.getFullYear()}`;
+                            }else if(_self.timeType == 'hour' ){
+                                timeStr = `${addZero(time.getMonth()+1)}-${addZero(time.getDate())} ${addZero(time.getHours())}  ${time.getFullYear()}`;
+                            }
+                            params.map(item=>{
+                                if(item.value)
+                                {
+                                valueStr += `${item.marker} ${item.seriesName}:${item.value[1]}<br/>`
+                                }
+                            })
+                            return `${timeStr}<br/>${valueStr}`
+                        }
+                    },
+                    legend: {
+                        y: 'bottom',
+                        data:legendArr,
+                    },
+                    grid: {  
+                        left: '10%',  
+                        right: '8%', 
+                        top: '10%',  
+                        bottom: '30%',
+                    },
+					xAxis: {
+                        type : 'time',
+                        axisLine:{lineStyle:{color:"#9898a4"}},
+                        splitLine:{show:false},
+                        axisLabel: {
+                                interval: 'auto',
+                                formatter: Labelformatter
+                        },
+                    },
+                    //9898a4
+					yAxis: {
+                        axisLine:{show:false, lineStyle:{color:"#9898a4"}},
+                        axisTick:{show:false},
+                        splitLine:{
+                            lineStyle:{
+                                type:'dashed'
+                            }
+                        }
+                    },
+                    series: seriesDate
+                    // series: []
+                }
+                var myChart = echarts.init(document.getElementById('echarts1'));
+                 // 使用刚指定的配置项和数据显示图表。
+                 myChart.setOption(option);
+            },
+            
+            timeChanges(e){
+                if(e.code == this.timeType){
+                    return
+                }
+                this.timeType = e.code;
+
+                if(this.timeType == 'minute'){//当他为分钟向前推进3个小时
+                    let starttime = `${getDateYMDH(dateAdd(new Date(),'h',-6),'-')}:00:00`;
+                    let endtime = `${getDateYMDH(dateAdd(new Date(),'h',-0),'-')}:00:00`;
+                    this.starHour = addZero(new Date(starttime).getHours());
+                    this.endHour = addZero(new Date().getHours());
+                    this.starttime = starttime;
+                    this.endtime = endtime;
+                }else if(this.timeType == 'hour'){//当他为小时 向前推进12小时
+                    let starttime = `${getDateYMDH(dateAdd(new Date(),'h',-12),'-')}:00:00`;
+                    let endtime = `${getDateYMDH(dateAdd(new Date(),'h',-0),'-')}:00:00`;
+                    this.starHour = addZero(new Date(starttime).getHours());
+                    this.endHour = addZero(new Date().getHours());
+                    this.starttime = starttime;
+                    this.endtime = endtime;
+                }else if(this.timeType == 'day'){
+                    let starttime = `${getDateYMD(dateAdd(new Date(),'d',-30),'-')}:00:00`;
+                    let endtime = `${getDateYMD(dateAdd(new Date(),'h',-0),'-')}:00:00`;
+                    this.starttime = starttime;
+                    this.endtime = endtime;
+                }
+                this.queryData()
+            },
+            timeConfirmChange1(e){//第一个时间确定
+                let date = new Date(this.starttime)
+                //设置小时
+                this.starttime =   `${date.getFullYear()}/${date.getMonth()+1}/${date.getDate()} ${addZero(e)}:00:00`;
+                this.starHour = addZero(e);
+                this.show1 = false;
+            },
+            timeConfirmChange2(e){//第二个时间确定
+                let date = new Date(this.endtime)
+                //设置小时
+                this.endtime =   `${date.getFullYear()}/${date.getMonth()+1}/${date.getDate()} ${addZero(e)}:00:00`;
+                this.endHour = addZero(e);
+                this.show2 = false;
+            },
+            timeclick(){//确定
+                if(this.timeType == 'day'){
+
+                }else{
+                    
+                    
+                }
+                console.log(this.starttime, this.endtime )
+                this.show = false;
+            },
+            cityButtomChange(e){//切换站点
+                console.log(e.name)
+                if( e.name == this.siteName){
+                    return ''
+                }
+                this.siteName = e.name;
+                this.setLineChart()
+            },
+            calendarSelectChange(e){//选中日历时
+                if(e[1] !=null){//当他修改
+                    let eDate = e[1];
+                    this.enttimeStr = `${eDate.getMonth()+1}月${eDate.getDate()}日`
+                    this.endtime = `${eDate.getFullYear()}/${eDate.getMonth()+1}/${eDate.getDate()} ${this.endHour}:00:00`
+                }else{
+                    let sDate = e[0];
+                    this.starttimeStr = `${sDate.getMonth()+1}月${sDate.getDate()}日`
+                    this.enttimeStr = `${sDate.getMonth()+1}月${sDate.getDate()}日`
+
+                    this.starttime = `${sDate.getFullYear()}/${sDate.getMonth()+1}/${sDate.getDate()} ${this.starHour}:00:00`
+                    this.endtime = `${sDate.getFullYear()}/${sDate.getMonth()+1}/${sDate.getDate()} ${this.endHour}:00:00`
+                }
+            },
+            airChanges(e){//切换污染物
+                this.setLineChart()
+            }
+        }    
+		
+	});
+	
+</script>
+
+</body>
+</html>

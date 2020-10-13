@@ -3,7 +3,7 @@
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-	<title>城市对比</title>
+	<title>竞比城市</title>
     <style>
         body{
             margin:0;
@@ -237,7 +237,7 @@
                 chartObj:{},
                 starttime:'',//查询时间
                 endtime:'',//
-                color:['#4389fb','#dd5142','#ff9700','#42988f','#44b041']
+                color:['#4cc661','#3578eb','#48ceb3','#f2aa00','#f5516c']
             },
 		created() {
             _self = this;
@@ -274,176 +274,12 @@
                 getHttp('/chinaMoniData/getMutilCityOnChinaByLongTime',params).then(res=>{
                     if(res.data.result && res.data.result.length>0){
                         this.allData = res.data.result;
-                        this.ProcessingData(res.data.result)
                     }else{
                         this.tableList = [];
                         this.chartObj = {}
                         this.setBarEchart()
                     }
                 })
-            },
-            ProcessingData(){//数据进行处理
-                let obj = {}
-                let chartObj = {}
-                
-                for (let index = 0; index < this.citySelectArr.length; index++) {
-                    obj[this.citySelectArr[index].citycode] = []
-                    chartObj[this.citySelectArr[index].citycode] = []
-                }
-                for (let index = 0; index < this.allData.length; index++) {
-                        obj[this.allData[index].citycode].push(this.allData[index])
-                    
-                }
-                this.tableList = []
-                for (let index = 0; index < obj[this.citySelectArr[0].citycode].length; index++) {
-                    let datatime = obj[this.citySelectArr[0].citycode][index].datatime;
-                    var date = new Date(datatime.replace(/-/g, '/'))
-                    let time = ''
-                    if(this.timeCode == 'day'){
-                        time = `${date.getMonth()+1}月${date.getDate()}日`
-                    }else if(this.timeCode == 'hour'){
-                        time = `${addZero(date.getMonth()+1)}-${addZero(date.getDate())} ${addZero(date.getHours())}:00`
-                    }else if(this.timeCode == 'month'){
-                        time = `${date.getFullYear()}年${date.getMonth()+1}月`
-                    }
-                    
-                    this.tableList.push({
-                            datatime:`${date.getFullYear()}-${addZero(date.getMonth()+1)}-${addZero(date.getDate())} ${addZero(date.getHours())}:${addZero(date.getMinutes())}:00`,
-                            time:time,
-                            city1:obj[this.citySelectArr[0].citycode][index][this.buttonCode],
-                            city2:obj[this.citySelectArr[1].citycode][index][this.buttonCode],
-                            city3:obj[this.citySelectArr[2].citycode][index][this.buttonCode],
-                            city4:obj[this.citySelectArr[3].citycode][index][this.buttonCode],
-                            city5:obj[this.citySelectArr[4].citycode][index][this.buttonCode]
-                        })
-                    chartObj[this.citySelectArr[0].citycode].push([datatime,obj[this.citySelectArr[0].citycode][index][this.buttonCode] ])   
-                    chartObj[this.citySelectArr[1].citycode].push([datatime,obj[this.citySelectArr[1].citycode][index][this.buttonCode] ])     
-                    chartObj[this.citySelectArr[2].citycode].push([datatime,obj[this.citySelectArr[2].citycode][index][this.buttonCode] ])   
-                    chartObj[this.citySelectArr[3].citycode].push([datatime,obj[this.citySelectArr[3].citycode][index][this.buttonCode] ])   
-                    chartObj[this.citySelectArr[4].citycode].push([datatime,obj[this.citySelectArr[4].citycode][index][this.buttonCode] ])   
-                    
-                }
-                this.tableList.sort(function(a,b){return b['datatime'] < a['datatime'] ? 1 : -1 })
-
-                this.chartObj = chartObj;
-                this.setBarEchart()
-            },
-            returnCityName(citycode){
-                let name = ''
-                this.cityArr.map(item=>{
-                    if( item.citycode == citycode){
-                        name = item.cityname;
-                    }
-                })
-                return name;
-            },
-            setBarEchart(){//设置折线图
-                let seriesDate = [];
-                let legendArr = []
-                if(JSON.stringify(this.chartObj) != '{}' ){
-                    let colorIndex = 0;
-                    this.citySelectArr.map(item=>{
-                        let key = item.citycode;
-                        seriesDate.push({
-                            name: this.returnCityName(key),
-                            type: 'line',
-                            symbol: 'none',
-                            data:this.chartObj[key],
-                            color:this.color[colorIndex],
-                            itemStyle: {
-                                normal: {
-                                    lineStyle: {
-                                        width:1// 0.1的线条是非常细的了
-                                    }
-                                }
-                            },
-                        })
-                        legendArr.push( this.returnCityName(key))
-                        colorIndex+=1;
-                    })
-                }
-
-                let Labelformatter =  null;
-                if(this.timeCode == 'month'){
-                    Labelformatter = function(params,index){
-                        let date = new Date(params)
-                        let str = `${date.getFullYear()}-${date.getMonth()+1}`;
-                        return str
-                    }
-                }else{
-                    Labelformatter = function(params,index){
-                        let date = new Date(params)
-                        let str;
-                        if(date.getHours() == 0 || date.getMinutes() > 0 || date.getSeconds() > 0){
-                            str  = index === 0 ? '':`${date.getMonth() +1}月${date.getDate()}日`
-                        }else{
-                            str  = index === 0 ? '':`${date.getHours()}:00`
-                        }
-                        return str
-                    }
-                }
-
-                let _self = this;
-                let option = {
-                    tooltip: {
-                        trigger: 'axis',
-                        confine:true,
-                        formatter:function(params) {
-                            let time = '';
-                            let timeStr ='';
-                            let valueStr = ''
-                            time = new Date(params[0].value[0]);
-                            if(_self.timeCode == 'month' ){
-                                timeStr = `${addZero(time.getMonth()+1)} ${time.getFullYear()}`;
-                            }else if(_self.timeCode == 'day' ){
-                                timeStr = `${addZero(time.getMonth()+1)}-${addZero(time.getDate())}  ${time.getFullYear()}`;
-                            }else if(_self.timeCode == 'hour' ){
-                                timeStr = `${addZero(time.getMonth()+1)}-${addZero(time.getDate())} ${addZero(time.getHours())}  ${time.getFullYear()}`;
-                            }
-                            params.map(item=>{
-                                if(item.value)
-                                {
-                                valueStr += `${item.marker} ${item.seriesName}:${item.value[1]}<br/>`
-                                }
-                            })
-                            return `${timeStr}<br/>${valueStr}`
-                        }
-                    },
-                    legend: {
-                        y: 'bottom',
-                        data:legendArr,
-                    },
-                    grid: {  
-                        left: '10%',  
-                        right: '8%', 
-                        top: '10%',  
-                        bottom: '30%',
-                    },
-					xAxis: {
-                        type : 'time',
-                        axisLine:{lineStyle:{color:"#9898a4"}},
-                        splitLine:{show:false},
-                        axisLabel: {
-                                interval: 'auto',
-                                formatter: Labelformatter
-                        },
-                    },
-                    //9898a4
-					yAxis: {
-                        axisLine:{show:false, lineStyle:{color:"#9898a4"}},
-                        axisTick:{show:false},
-                        splitLine:{
-                            lineStyle:{
-                                type:'dashed'
-                            }
-                        }
-                    },
-                    series: seriesDate
-                    // series: []
-                }
-                var myChart = echarts.init(document.getElementById('echarts1'));
-                 // 使用刚指定的配置项和数据显示图表。
-                 myChart.setOption(option,true);
             },
             airButtomChange(item,index){//切换污染物
                 if( this.buttonCode !== item.code){
@@ -498,9 +334,8 @@
                     this.yearDateSelct = [date.getFullYear()-1,date.getFullYear() ]
                     this.defaultDateStr = `${getDateYM(dateAdd(new Date(starttime.replace(/-/g, '/')),'d',-0),'-')}  -  ${getDateYM(dateAdd(new Date(endtime.replace(/-/g, '/')),'d',-0),'-')}`
                     
-                    this.starttime = `${getDateYM(dateAdd(new Date(starttime.replace(/-/g, '/')),'h',-0),'')}01000000`;
-                    let endHour = addZero(getLastDateDay(new Date(`${getDateYM(dateAdd(new Date(endtime.replace(/-/g, '/')),'h',-0),'/')}`)))
-                    this.endtime = `${getDateYM(dateAdd(new Date(endtime.replace(/-/g, '/')),'h',-0),'')}${endHour}000000`;
+                    this.starttime = `${getDateYM(dateAdd(new Date(starttime.replace(/-/g, '/')),'h',-0),'')}00000000`;
+                    this.endtime = `${getDateYM(dateAdd(new Date(endtime.replace(/-/g, '/')),'h',-0),'')}00000000`;
 
                     this.airButtonArr=[
                         {code:'countindex',name:'综合指数',html:'综合指数'},
@@ -695,11 +530,9 @@
 
                 this.defaultDateStr = `${getDateYM(dateAdd(new Date(starttime.replace(/-/g, '/')),'d',-0),'-')}  -  ${getDateYM(dateAdd(new Date(endtime.replace(/-/g, '/')),'d',-0),'-')}`
                     
-                this.starttime = `${getDateYM(dateAdd(new Date(starttime.replace(/-/g, '/')),'h',-0),'')}01000000`;
+                this.starttime = `${getDateYM(dateAdd(new Date(starttime.replace(/-/g, '/')),'h',-0),'')}00000000`;
+                this.endtime = `${getDateYM(dateAdd(new Date(endtime.replace(/-/g, '/')),'h',-0),'')}00000000`;
 
-                // this.endtime = `${getDateYM(dateAdd(new Date(endtime.replace(/-/g, '/')),'h',-0),'')}00000000`;
-                let endHour = addZero(getLastDateDay(new Date(`${getDateYM(dateAdd(new Date(endtime.replace(/-/g, '/')),'h',-0),'/')}`)))
-                this.endtime = `${getDateYM(dateAdd(new Date(endtime.replace(/-/g, '/')),'h',-0),'')}${endHour}000000`;
                 this.queryData()
             },
             //自定义日历结束
