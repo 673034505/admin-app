@@ -3,7 +3,7 @@
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-	<title>综合指数分担率</title>
+	<title></title>
     <style>
         body{
             margin:0;
@@ -20,8 +20,8 @@
             -ms-user-select:none;
             user-select:none;
         }   
-		.competitionCity{
-			height: 100vh;
+		.pages{
+			min-height: 100vh;
 			width: 100vw;
 			overflow: hidden;
 			overflow-y: auto;
@@ -33,7 +33,7 @@
         
     </style>
     <link rel="stylesheet" href="./js/vant.css">
-    <link rel="stylesheet" href="./css/indexShareRate.css">
+    <link rel="stylesheet" href="./css/siteInformation.css">
 	<script src="./js/date.js"></script>
 	<script src="./js/aqi.js"></script>
     <script src="./js/vue.js" type="text/javascript" charset="utf-8"></script>
@@ -46,12 +46,71 @@
 <body >
 
 
-<div class="competitionCity" id="app">
+<div class="pages" id="app">
 	<!-- 优化当页面一开始进入时加载出问题 -->
 	<div class="model"  :style="{height:load?'0':''}">
     </div>
+    <van-popup v-model="PopupShow" :close-on-click-overlay="false">
+            <van-loading  type="spinner" style="background-color: #4c4c4c;" />
+    </van-popup>
+        <!-- 内容 -->
         <div class="container">
+            <div class="nav-title">
+                <div class="radioBox"> <div class="radioMinBox"></div> </div>
+                <div class="title">{{cityname}}最近24小时趋势</div>
+            </div>
+
+            <div class="airButton air-flex">
+                <div class="a-button" v-bind:class="[ item.code == buttonCode ? 'b_button' : '']" v-for="(item,index) in airButtonArr" :key="index" @click="airButtomChange(item)">  <div v-html="item.html" class="b-text"></div> </div>
+            </div>
+
+            <!-- 柱状图 -->
+            <div class="chart1">
+                <div class="echart" id="echarts1"></div>
+            </div>
+
+            <!-- 折线图 -->
+            <div class="chart2">
+                <div class="echart" id="echarts2"></div>
+            </div>
             
+            <div style="background-color: #f6f7f9;height: 10px;"></div>
+
+            <div class="nav-title" style="padding-top: 5px;">
+                <div class="radioBox"> <div class="radioMinBox"></div> </div>
+                <div class="title">{{cityname}}最近24小时数据清单</div>
+                <div class="right-title">单位:CO:mg/m³,其余μg/m³ </div>
+            </div>
+            
+            <div class="table-box">
+                <table border="0" cellspacing="0" cellpadding="0">
+                    <thead>
+                        <tr>
+                            <th width="20%">时间</th>
+                            <th width="11.4%">AQI</th>
+                            <th width="11.4%">PM2.5</th>
+                            <th width="11.4%">PM10</th>
+                            <th width="11.4%">O3</th>
+                            <th width="11.4%">SO2</th>
+                            <th width="11.4%">NO2</th>
+                            <th width="11.4%">CO</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(item, index) in tableList" :key="index">
+                            <td> {{item.time}} </td>
+                            <td>{{item.aqi}}</td>
+                            <td>{{item.pm25}}</td>
+                            <td>{{item.pm10}}</td>
+                            <td>{{item.o3}}</td>
+                            <td>{{item.so2}}</td>
+                            <td>{{item.no2}}</td>
+                            <td>{{item.co}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
         </div>    		
 </div>
 
@@ -65,18 +124,309 @@
 			   //下拉刷新
 			   load:true,//窗体加载
                clientWidth:'',
+               PopupShow:true,
+               cityname:'市环保局',//路桥公司  市环保局
+               airButtonArr:[
+                    {code:'aqi',name:'AQI',html:'AQI'},
+                    {code:'pm25',name:'PM2.5',html:'PM<sub>2.5</sub>'},
+                    {code:'pm10',name:'PM10',html:'PM<sub>10</sub>'},
+                    {code:'o3',name:'O3',html:'O<sub>3</sub>'},
+                    {code:'so2',name:'SO2',html:'SO<sub>2</sub>'},
+                    {code:'no2',name:'NO2',html:'NO<sub>2</sub>'},
+                    {code:'co',name:'CO',html:'CO'},
+                ],
+                buttonCode:'aqi',
+                airColor:{'aqi':'#42cb61','pm25':'#3577f1','pm10':'#4cccb3','o3_8h':'#f1a905','o3':'#f1a905','so2':'#f5516c','no2':'#9560e6','co':'#46cdfc' },
+                airName:{'aqi':'AQI','pm25':'PM2.5','pm10':'PM10','o3_8h':'O3','o3':'O3','so2':'SO2','no2':'NO2','co':'CO' },
+                tableList:[],
+                starttime:'',//数据查询 YYYYMMDDhhmmss
+                endtime:'',//数据查询	YYYYMMDDhhmmss
+                starttimeinit:'',//开始时间 	YYYY-MM-DD hh:mm:ss
+                endtimeinit:'',//结束时间		YYYY-MM-DD hh:mm:ss
+                selectendtime:'',//向前推一个小时
+                allData:[],//所以数据
+                siteData:[],
             },
 		created() {
             _self = this;
+            //初始化  向前推进24小时
+			this.starttimeinit = `${getDateYMDH(dateAdd(new Date(),'h',-24),'-')}:00:00`;
+            this.endtimeinit =  `${getDateYMDH(dateAdd(new Date(),'h',-0),'-')}:00:00`;
+            this.selectendtime = `${getDateYMDH(dateAdd(new Date(),'h',-1),'-')}:00:00`;
 
+			this.starttime = `${getDateYMDH(dateAdd(new Date(this.starttimeinit.replace(/-/g, '/')),'h',-0),'')}0000`;
+            this.endtime = `${getDateYMDH(dateAdd(new Date(this.endtimeinit.replace(/-/g, '/')),'h',0),'')}0000`;
+
+            this.queryData();
         },  
 		mounted : function(){
-			this.load = true
+            this.load = true
+            this.PopupShow = false;
 			 //解决键盘出来 屏幕缩小的问题
              this.clientWidth = document.documentElement.clientWidth;
         },
         methods: {
+            airButtomChange(item){//切换污染物
+                if( this.buttonCode !== item.code){
+                    this.buttonCode = item.code;
+                    this.echatName = item.name;
+                    this.setBarEchart();
+                }
+            },
+            queryData(){//数据查询
+                let params = {
+                    datatype:'gk',
+                    timetype:'hour',
+                    starttime:this.starttime,
+                    endtime:this.endtime,
+                }
+                getHttp('/airMoniData/getSplineByLongTime',params).then(res=>{
+                    if(res.data.result && res.data.result.length>0){
+                        this.allData = res.data.result;
+                        this.ProcessingData()
+                    }else{
+                        this.allData = [];
+                        this.ProcessingData()
+                    }
+                })
+            },
+            ProcessingData(){//数据处理
+                let siteObj = {}
+                if(this.allData.length>0){
+                    for (let index = 0; index < this.allData.length; index++) {
+                        if(!(siteObj.hasOwnProperty( this.allData[index].stationname) ) ){ //当他key值是否存在,不存在 添加
+                            siteObj[this.allData[index].stationname] = [this.allData[index] ]
+                        }else{
+                            siteObj[this.allData[index].stationname].push( this.allData[index])
+                        }
+                    }
+                }
+                //获取所有数据并根据所需显示的站点显示数据
+                this.siteData = siteObj[this.cityname];
+                if(this.siteData && this.siteData.length>0){
+                    this.setTableList();
+                }
+                
+                
+            },
+            setTableList(){//设置表格数据
+                let start = this.starttimeinit;
+                let end = this.selectendtime;
+                let endtime = new Date(end)
+                var t=0;let arr = []; let newDataArr = this.siteData;
+                let types = 'h';
+                while(dateAdd(new Date(start),types,t)<=endtime)//遍历日期时间
+                {
+                    var times =getDateYMDHMS(dateAdd(new Date(start),types,t));//获得日期
+                    let time = new Date(times)
+                    var foreValue 
+                    for(let i=0;i<newDataArr.length;i++)//遍历模型下面的数组
+                    {
+                        if(times==newDataArr[i]["datatime"])//根据时间查找数据
+                        {   
+                            foreValue = {
+                                    time:`${addZero(time.getMonth()+1)}-${addZero(time.getDate())} ${addZero(time.getHours())}:00`,
+                                    datatime:times,
+                                    aqi:this.siteData[i].aqi < 0?'-':this.siteData[i].aqi,
+                                    pm25:this.siteData[i].pm25 < 0?'-':this.siteData[i].pm25,
+                                    pm10:this.siteData[i].pm10 < 0?'-':this.siteData[i].pm10,
+                                    o3:this.siteData[i].o3 < 0?'-':this.siteData[i].o3,
+                                    so2:this.siteData[i].so2 < 0?'-':this.siteData[i].so2,
+                                    no2:this.siteData[i].no2 < 0?'-':this.siteData[i].no2,
+                                    co:this.siteData[i].co < 0?'-':this.siteData[i].co,
+                                }
+                            
+                        break;
+                        }else{
+                            foreValue = {
+                                    time:`${addZero(time.getMonth()+1)}-${addZero(time.getDate())} ${addZero(time.getHours())}:00`,
+                                    datatime:times,
+                                    aqi:'-',
+                                    pm25:'-',
+                                    pm10:'-',
+                                    o3:'-',
+                                    so2:'-',
+                                    no2:'-',
+                                    co:'-',
+                                }
+                        }
+                    }
+                    arr.push(foreValue)
+                    t=t+1;
+                }
 
+                this.tableList = arr;
+                this.tableList.sort(function(a,b){return b['datatime'] > a['datatime'] ? 1 : -1 });
+
+                
+                this.setBarEchart();
+                this.setLineEchart();
+            },
+            setBarEchart(){//设置柱状图
+                let  seriesDate = []
+                let seriesName = this.airName[this.buttonCode];
+                let yAxisNameObj = {'aqi':'','pm25':'μg/m3','pm10':'μg/m3','o3':'μg/m3','so2':'μg/m3','no2':'μg/m3','co':'mg/m3','temp':'℃','rh':'%','wind_speed':'m/s','rain':'mm'}
+                let yAxisName = yAxisNameObj[this.buttonCode]
+                for (let index = 0; index < this.tableList.length; index++) {
+                    seriesDate.push([this.tableList[index].datatime,this.tableList[index][this.buttonCode]=='-'?'null':this.tableList[index][this.buttonCode] ])
+                }
+                let _self = this;
+                let option = {
+                    tooltip: {
+                        trigger: 'axis',
+                        confine:true,
+						formatter:function(params) {
+						    let time = '';
+						    let timeStr ='';
+						    let valueStr = ''
+						    time = new Date(params[0].value[0]);
+                            timeStr = `${time.getFullYear()}-${addZero(time.getMonth()+1)}-${addZero(time.getDate())} ${addZero(time.getHours())}时  `;
+                            params.map(item=>{
+                                if(item.value){
+                                    valueStr += `${item.marker} ${item.seriesName}:${item.value[1]}<br/>`
+                                }
+                            })
+						    return `${timeStr}<br/>${valueStr}`
+						}
+                    },
+                    grid: {  
+                        left: '10%',  
+                        right: '8%', 
+                        top: '5%',  
+                        bottom: '13%',
+                    },
+					xAxis: {
+                        type : 'time',
+                        axisLine:{lineStyle:{color:"#9898a4"}},
+                        splitLine:{show:false},
+                        axisLabel: {
+                                interval: 'auto',
+                                // showMaxLabel:false,
+                                formatter: (params,index)=>
+                                {
+                                    let date = new Date(params)
+                                    let str =  `${addZero(date.getHours())}:00`;
+                                    return str
+                                }
+                        },
+                    },
+                    //9898a4
+					yAxis: {
+                        name:yAxisName,
+                        axisLine:{show:false, lineStyle:{color:"#9898a4"}},
+                        axisTick:{show:false},
+                        splitLine:{
+                            lineStyle:{
+                                type:'dashed'
+                            }
+                        }
+                    },
+					series: [{
+						name: seriesName,
+                        type: 'bar',
+                        itemStyle: {
+                            normal: {
+                                color: function(params) {
+                                    return getPollLevelColor(_self.buttonCode,params.data[1],'hour')
+                                },
+                            }
+                        },
+						data: seriesDate
+					}]
+                }
+                var myChart = echarts.init(document.getElementById('echarts1'));
+                 // 使用刚指定的配置项和数据显示图表。
+                 myChart.setOption(option,true);
+            },
+            setLineEchart(){//设置折线图
+                let allObj = {'aqi':[],'pm25':[],'pm10':[],'o3':[],'so2':[],'no2':[],'co':[]};
+                for (let index = 0; index < this.tableList.length; index++) {
+                    for(let key in allObj ){
+                        allObj[key].push([this.tableList[index]['datatime'] ,this.tableList[index][key]=='-'?'null':this.tableList[index][key]] )
+                    }
+                }
+                let series = []
+                let legendArr = []
+                for(let key in allObj){
+                    series.push({
+                        name:this.airName[key],
+                        type:'line',
+                        symbol:'circle',
+                        symbolSize:3,
+                        smooth:false,
+                        itemStyle: {
+                            normal: {
+                                lineStyle: {
+                                    width:1// 0.1的线条是非常细的了
+                                }
+                            }
+                        },
+                        color:this.airColor[key], 
+                        showAllSymbol: true,
+						data: allObj[key]
+                    })
+                    legendArr.push(this.airName[key])
+                }
+                let option = {
+                    tooltip: {
+                        trigger: 'axis',
+                        confine:true,
+                        formatter:function(params){
+                            let time = '';
+                            let timeStr ='';
+                            let valueStr = ''
+                            time = new Date(params[0].value[0]);
+							timeStr = `${time.getFullYear()}-${addZero(time.getMonth()+1)}-${addZero(time.getDate())} ${addZero(time.getHours())}时  `;
+                            params.map(item=>{
+                                if(item.value){   
+                                    valueStr += `${item.marker} ${item.seriesName}:${item.value[1]}<br/>`
+                                }
+                            })
+                            return `${timeStr}<br/>${valueStr}`
+                        }
+                    },
+                    legend: {
+                        y: 'bottom',
+                        data:legendArr,
+                    },
+                    grid: {  
+                        left: '10%',  
+                        right: '8%', 
+                        top: '10%',  
+                        bottom: '30%',
+                    },
+					xAxis: {
+                        type : 'time',
+                        axisLine:{lineStyle:{color:"#9898a4"}},
+                        splitLine:{show:false},
+                        axisLabel: {
+                                interval: 'auto',
+                                // showMaxLabel:false,
+                                formatter: (params,index)=>
+                                {
+                                    let date = new Date(params)
+                                    let str =  `${addZero(date.getHours())}:00`;
+                                    return str
+                                }
+                        },
+                    },
+                    //9898a4
+					yAxis: {
+                        axisLine:{show:false, lineStyle:{color:"#9898a4"}},
+                        axisTick:{show:false},
+                        splitLine:{
+                            lineStyle:{
+                                type:'dashed'
+                            }
+                        }
+                    },
+                    series: series
+                    // series: []
+                }
+                var myChart = echarts.init(document.getElementById('echarts2'));
+                 // 使用刚指定的配置项和数据显示图表。
+                 myChart.setOption(option,true);
+            }
         }    
 		
 	});

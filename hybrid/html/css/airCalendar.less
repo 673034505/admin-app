@@ -4,7 +4,77 @@
     
 }
 .container{
-    height: 100vh;
+    min-height: 100vh;
+    .calendar{
+        width: 100vw;
+        .title {
+            display: flex;
+            margin-left: 50px;
+            .nex{
+                width: 60px;
+                height: 40px;
+                text-align: center;
+                line-height: 40px;
+            }
+        }
+        .week-header{
+            margin: 0;
+            padding: 10px 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            .month{
+                display: inline-block;
+                width: 13.6%;
+                text-align: center;
+            }
+        }
+        .week-date{
+            padding: 0;
+            background: #ffffff;
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+            font-size: 12px;
+            justify-content: space-around;
+            .every-day{
+                display: inline-block;
+                width: 14.2%;
+                padding-bottom: 5px;
+                .dateSelect{
+                    border: 1px solid #92a7f6;
+                }
+                .every-box{
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    width: 80%;
+                    height: 45px;
+                    margin: 0 10%;
+                    flex-wrap: wrap;
+                    background: #eee;
+                    .bottom-primarypol{
+                        height: 30px;
+                        line-height: 10px;
+                        width: 100%;
+                        font-size: 8px;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                    }
+                    .top-days{
+                        height: 20px;
+                        line-height: 20px;
+                        width: 100%;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                    }
+                }
+            }
+        }
+    }
+
     .navTitle{
         height: 40px;
         width: 100vw;
@@ -41,7 +111,7 @@
                     height: 25px;
                     width: 25px;
                     border-radius: 50%;
-                    border: 1px solid #eee;
+                    border: 1px solid #aaa;
                     display: flex;
                     justify-content: center;
                     align-items: center;
